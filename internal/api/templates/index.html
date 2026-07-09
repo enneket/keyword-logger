@@ -876,22 +876,19 @@
   .keyboard-key::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    top: 0; left: 0; right: 0; bottom: 0;
     background: linear-gradient(135deg, rgba(255, 158, 100, 0.8), rgba(247, 118, 100, 0.6));
     opacity: 0;
     transition: opacity 0.2s;
   }
 
-  .keyboard-key.active {
-    border-color: var(--orange);
-    box-shadow: 0 0 12px rgba(255, 158, 100, 0.4);
+  .keyboard-key.pressed::before {
+    opacity: calc(var(--intensity, 0) * 0.8 + 0.2);
   }
 
-  .keyboard-key.active::before {
-    opacity: 0.3;
+  .keyboard-key.pressed {
+    border-color: rgba(255, 158, 100, 0.6);
+    box-shadow: 0 0 12px rgba(255, 158, 100, 0.3);
   }
 
   .keyboard-key .key-label {
@@ -1331,118 +1328,9 @@ function renderKeys(root, apps) {
     root.innerHTML = '<div class="empty">该应用暂无数据</div>';
     return;
   }
-  const [, s] = appData;
-  const keys = Object.entries(s.keys || {}).sort((a, b) => b[1] - a[1]);
-  const maxCount = keys.length ? keys[0][1] : 1;
 
-  // 计算字母键统计
-  const alphaKeys = keys.filter(([k, _]) => /^[A-Za-z]$/.test(k));
-  const alphaTotal = alphaKeys.reduce((sum, [_, v]) => sum + v, 0);
-  const alphaCount = alphaKeys.length;
-  const alphaPct = alphaTotal > 0 ? (alphaTotal / s.total * 100).toFixed(1) : "0.0";
-
-  // 计算字母使用频率分布（A-Z）
-  const alphaFreq = {};
-  for (let i = 0; i < 26; i++) {
-    alphaFreq[String.fromCharCode(65 + i)] = 0;
-  }
-  alphaKeys.forEach(([k, v]) => {
-    const upper = k.toUpperCase();
-    if (alphaFreq[upper] !== undefined) {
-      alphaFreq[upper] += v;
-    }
-  });
-
-  const maxAlphaFreq = Math.max(...Object.values(alphaFreq), 1);
-
-  // 构建字母频率分布条 HTML
-  const alphaFreqHtml = Object.entries(alphaFreq)
-    .sort((a, b) => b[1] - a[1])
-    .map(([letter, count]) => {
-      const barWidth = (count / maxAlphaFreq * 100).toFixed(1);
-      const pct = count > 0 ? (count / alphaTotal * 100).toFixed(1) : "0.0";
-      return `<div class="alpha-freq-row">
-        <span class="alpha-letter">${letter}</span>
-        <span class="alpha-count">${formatNum(count)}</span>
-        <div class="alpha-bar-track">
-          <div class="alpha-bar-fill" style="width:${barWidth}%"></div>
-        </div>
-        <span class="alpha-pct">${pct}%</span>
-      </div>`;
-    }).join("");
-
-  // 构建字母统计卡片 HTML
-  let alphaStatsHtml = '';
-  if (alphaCount > 0) {
-    alphaStatsHtml = `
-      <div class="alpha-stats-card">
-        <div class="alpha-stats-header">
-          <span class="alpha-stats-title">字母按键统计</span>
-          <span class="alpha-stats-badge">${alphaCount} 个字母</span>
-        </div>
-        <div class="alpha-stats-body">
-          <div class="alpha-stat-item">
-            <span class="alpha-stat-label">总次数</span>
-            <span class="alpha-stat-value">${formatNum(alphaTotal)}</span>
-          </div>
-          <div class="alpha-stat-item">
-            <span class="alpha-stat-label">占总按键</span>
-            <span class="alpha-stat-value">${alphaPct}%</span>
-          </div>
-          <div class="alpha-stat-item">
-            <span class="alpha-stat-label">最高频</span>
-            <span class="alpha-stat-value">${alphaFreqHtml ? Object.entries(alphaFreq).sort((a, b) => b[1] - a[1])[0][0] : '—'}</span>
-          </div>
-        </div>
-        <div class="alpha-freq-section">
-          <div class="alpha-freq-header">频率分布</div>
-          <div class="alpha-freq-grid">
-            ${alphaFreqHtml}
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
-  // 计算当前按键列表签名
-  const keysSig = keys.map(([k, v]) => `${k}:${v}`).join("|");
-
-  // 如果列表已存在且未变化，增量更新数字
-  const existingTable = root.querySelector(".key-table");
-  if (existingTable && existingTable.dataset.keysSig === keysSig) {
-    // 增量更新字母统计卡片（如果存在）
-    const alphaTotalEl = root.querySelector(".alpha-stat-value");
-    if (alphaTotalEl) {
-      const currTotal = parseInt(alphaTotalEl.textContent.replace(/,/g, "")) || 0;
-      if (currTotal !== alphaTotal) {
-        animateNumber(alphaTotalEl, currTotal, alphaTotal, 400);
-      }
-    }
-    return;
-  }
-
-  root.innerHTML = alphaStatsHtml + `
-    <div class="key-table fade-in" data-keys-sig="${keysSig}" style="margin-top: 20px;">
-    <div class="table-header">
-      <span class="col-key">按键</span>
-      <span class="col-count">次数</span>
-      <span class="col-pct">占比</span>
-      <span class="col-bar">分布</span>
-    </div>
-    ${keys.map(([k, v]) => {
-      const pct = (v / s.total * 100).toFixed(1);
-      const barPct = (v / maxCount * 100).toFixed(1);
-      const cls = classifyKey(k);
-      return `<div class="key-row">
-        <span class="col-key"><span class="${cls}">${escapeHtml(k)}</span></span>
-        <span class="col-count">${formatNum(v)}</span>
-        <span class="col-pct">${pct}%</span>
-        <span class="col-bar">
-          <span class="bar-track"><span class="bar-fill" style="width:${barPct}%;background:var(--accent)"></span></span>
-        </span>
-      </div>`;
-    }).join("")}
-  </div>`;
+  // 显示键盘热力图
+  renderKeyboard(lastData);
 }
 
 function classifyKey(k) {
@@ -1568,8 +1456,8 @@ function renderKeyboard(data) {
               const count = appData.keys[key] || 0;
               const intensity = count > 0 ? Math.min(count / maxCount, 1) : 0;
               return `
-                <div class="keyboard-key ${width || ''} ${count > 0 ? 'active' : ''}"
-                     style="${count > 0 ? `opacity: ${0.3 + intensity * 0.7};` : 'opacity: 0.3;'}">
+                <div class="keyboard-key ${width || ''} ${count > 0 ? 'pressed' : ''}"
+                     style="${count > 0 ? `--intensity: ${intensity};` : ''}">
                   <span class="key-label">${label || key}</span>
                   ${count > 0 ? `<span class="key-count">${count}</span>` : ''}
                 </div>
