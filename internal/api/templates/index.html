@@ -851,8 +851,8 @@
 
   .keyboard-row {
     display: flex;
-    gap: 4px;
-    margin-bottom: 4px;
+    gap: 2px;
+    margin-bottom: 2px;
     justify-content: center;
   }
 
@@ -917,28 +917,28 @@
   .keyboard-key.wide-375 { width: 182px; } /* 6.5u  */
   .keyboard-key.wide-425 { width: 196px; } /* 7u    */
 
-  /* 86键布局 */
-  .keyboard-86 .keyboard-row {
+  /* 87键布局 */
+  .keyboard-87 .keyboard-row {
     gap: 2px;
   }
 
-  .keyboard-86 .keyboard-key {
+  .keyboard-87 .keyboard-key {
     font-size: 10px;
     min-height: 38px;
   }
 
   /* 第一行: ` 1 2 3 4 5 6 7 8 9 0 - = BackSpace */
   /* BackSpace: 4u = 112px */
-  .keyboard-86 .keyboard-key.wide-225 { width: 112px; }
+  .keyboard-87 .keyboard-key.wide-225 { width: 112px; }
 
   /* 第二行: Tab q w e r t y u i o p [ ] \ */
   /* Tab: 1.5u = 42px, \: 1.5u = 42px */
-  .keyboard-86 .keyboard-key.wide-05 { width: 42px; }
+  .keyboard-87 .keyboard-key.wide-05 { width: 42px; }
 
   /* 第三行: Caps a s d f g h j k l ; ' Enter */
   /* Caps: 2u = 56px, Enter: 5u = 140px */
-  .keyboard-86 .keyboard-key.wide-2 { width: 56px; }
-  .keyboard-86 .keyboard-key.wide-275 { width: 140px; }
+  .keyboard-87 .keyboard-key.wide-2 { width: 56px; }
+  .keyboard-87 .keyboard-key.wide-275 { width: 140px; }
 
   /* 第四行: Shift z x c v b n m , . / Shift */
   /* Shift_L: 4u = 112px, Shift_R: 5.5u = 154px */
@@ -946,7 +946,7 @@
 
   /* 第五行: Ctrl Win Alt Space Alt Win Ctrl */
   /* Ctrl: 1.5u = 42px, Win: 1.25u = 35px, Alt: 1.25u = 35px, Space: 6u = 168px */
-  .keyboard-86 .keyboard-key.wide-025 { width: 35px; }
+  .keyboard-87 .keyboard-key.wide-025 { width: 35px; }
 
   /* 108键布局 */
   .keyboard-108 .keyboard-row {
@@ -1008,7 +1008,7 @@
   <div id="chart"></div>
   <div class="keyboard-layout" id="keyboardLayout" style="display: none;">
     <span class="label">键盘</span>
-    <button data-layout="86" class="active">86键</button>
+    <button data-layout="87" class="active">87键</button>
     <button data-layout="108">108键</button>
   </div>
   <div id="keyboard"></div>
@@ -1036,7 +1036,7 @@ const appFilter = params.get("app") || "";
 const backLink = document.getElementById("back");
 backLink.style.display = appFilter ? "inline-flex" : "none";
 
-let state = { granularity: "", keyboardLayout: "86" };
+let state = { granularity: "", keyboardLayout: "87" };
 let lastData = null;
 let lastStats = null;  // { total, appCount, topApp, topCount }
 let lastAppsKey = "";  // 应用列表的签名，用于判断是否需要重绘
@@ -1377,17 +1377,27 @@ function classifyKey(k) {
 
 // 键盘布局定义
 const KEYBOARD_LAYOUTS = {
-  '86': {
-    name: '86键',
+  '87': {
+    name: '87键',
     rows: [
-      // 第一行：数字键 (BackSpace: 4u = 112px)
+      // Row 1: 功能键 (Esc + F1-F12 = 13键)
+      // Esc: 1.5u = 42px, Fn: 1.25u = 35px
+      [
+        { key: 'Escape', label: 'Esc', width: 'wide-05' },
+        { key: 'F1', label: 'F1' }, { key: 'F2', label: 'F2' }, { key: 'F3', label: 'F3' },
+        { key: 'F4', label: 'F4' }, { key: 'F5', label: 'F5' }, { key: 'F6', label: 'F6' },
+        { key: 'F7', label: 'F7' }, { key: 'F8', label: 'F8' }, { key: 'F9', label: 'F9' },
+        { key: 'F10', label: 'F10' }, { key: 'F11', label: 'F11' }, { key: 'F12', label: 'F12' }
+      ],
+      // Row 2: 数字行 (BackSpace: 4u = 112px)
       [
         { key: '`', label: '`' }, { key: '1', label: '1' }, { key: '2', label: '2' }, { key: '3', label: '3' },
         { key: '4', label: '4' }, { key: '5', label: '5' }, { key: '6', label: '6' },
         { key: '7', label: '7' }, { key: '8', label: '8' }, { key: '9', label: '9' },
-        { key: '0', label: '0' }, { key: '-', label: '-' }, { key: '=', label: '=' }, { key: 'BackSpace', label: '←', width: 'wide-225' }
+        { key: '0', label: '0' }, { key: '-', label: '-' }, { key: '=', label: '=' },
+        { key: 'BackSpace', label: '←', width: 'wide-225' }
       ],
-      // 第二行 (Tab: 1.5u = 42px, \: 1.5u = 42px)
+      // Row 3: QWERTY (Tab: 1.5u = 42px, \: 1.5u = 42px)
       [
         { key: 'Tab', label: 'Tab', width: 'wide-05' },
         { key: 'q', label: 'Q' }, { key: 'w', label: 'W' }, { key: 'e', label: 'E' }, { key: 'r', label: 'R' },
@@ -1395,7 +1405,7 @@ const KEYBOARD_LAYOUTS = {
         { key: 'o', label: 'O' }, { key: 'p', label: 'P' },
         { key: '[', label: '[' }, { key: ']', label: ']' }, { key: '\\', label: '\\', width: 'wide-05' }
       ],
-      // 第三行 (Caps: 2u = 56px, Enter: 5u = 140px)
+      // Row 4: ASDF (Caps: 2u = 56px, Enter: 5u = 140px)
       [
         { key: 'Caps_Lock', label: 'Caps', width: 'wide-2' },
         { key: 'a', label: 'A' }, { key: 's', label: 'S' }, { key: 'd', label: 'D' }, { key: 'f', label: 'F' },
@@ -1403,7 +1413,7 @@ const KEYBOARD_LAYOUTS = {
         { key: 'k', label: 'K' }, { key: 'l', label: 'L' },
         { key: ';', label: ';' }, { key: "'", label: "'" }, { key: 'Enter', label: 'Enter', width: 'wide-275' }
       ],
-      // 第四行 (Shift_L: 4u = 112px, Shift_R: 5.5u = 154px)
+      // Row 5: ZXCV (Shift_L: 4u = 112px, Shift_R: 5.5u = 154px)
       [
         { key: 'Shift_L', label: 'Shift', width: 'wide-225' },
         { key: 'z', label: 'Z' }, { key: 'x', label: 'X' }, { key: 'c', label: 'C' }, { key: 'v', label: 'V' },
@@ -1411,7 +1421,7 @@ const KEYBOARD_LAYOUTS = {
         { key: ',', label: ',' }, { key: '.', label: '.' }, { key: '/', label: '/' },
         { key: 'Shift_R', label: 'Shift', width: 'wide-325' }
       ],
-      // 第五行 (Ctrl: 1.5u = 42px, Win/Alt: 1.25u = 35px, Space: 6u = 168px)
+      // Row 6: 空格键 (Ctrl: 1.5u = 42px, Win/Alt: 1.25u = 35px, Space: 6u = 168px, Fn: 1.25u = 35px)
       [
         { key: 'Control_L', label: 'Ctrl', width: 'wide-05' },
         { key: 'Super_L', label: 'Win', width: 'wide-025' },
@@ -1419,7 +1429,27 @@ const KEYBOARD_LAYOUTS = {
         { key: ' ', label: '', width: 'wide-35' },
         { key: 'Alt_R', label: 'Alt', width: 'wide-025' },
         { key: 'Super_R', label: 'Win', width: 'wide-025' },
-        { key: 'Control_R', label: 'Ctrl', width: 'wide-05' }
+        { key: 'Control_R', label: 'Ctrl', width: 'wide-05' },
+        { key: 'Fn', label: 'Fn', width: 'wide-025' }
+      ],
+      // Row 7: 编辑键区上排 (Insert + Home + PageUp) - 每键 1.5u = 42px
+      [
+        { key: 'Insert', label: 'Ins', width: 'wide-05' },
+        { key: 'Home', label: 'Home', width: 'wide-05' },
+        { key: 'PageUp', label: 'PgUp', width: 'wide-05' }
+      ],
+      // Row 8: 编辑键区下排 (Delete + End + PageDown + ↑) - 每键 1.5u = 42px
+      [
+        { key: 'Delete', label: 'Del', width: 'wide-05' },
+        { key: 'End', label: 'End', width: 'wide-05' },
+        { key: 'PageDown', label: 'PgDn', width: 'wide-05' },
+        { key: 'Up', label: '↑', width: 'wide-05' }
+      ],
+      // Row 9: 方向键区 (← + ↓ + →) - 每键 1.5u = 42px
+      [
+        { key: 'Left', label: '←', width: 'wide-05' },
+        { key: 'Down', label: '↓', width: 'wide-05' },
+        { key: 'Right', label: '→', width: 'wide-05' }
       ]
     ]
   },
