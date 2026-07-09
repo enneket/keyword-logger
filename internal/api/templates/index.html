@@ -917,63 +917,93 @@
   .keyboard-key.wide-375 { width: 182px; } /* 6.5u  */
   .keyboard-key.wide-425 { width: 196px; } /* 7u    */
 
-  /* 87键布局 */
+  /* ========== 87键标准 TKL 布局 ========== */
+  /* 基于真实 Cherry MX / Filco 87键精确测量 */
+  /* 1u = 28px, 0.25u 步进 */
+
   .keyboard-87 .keyboard-row {
     gap: 2px;
+    margin-bottom: 2px;
   }
 
   .keyboard-87 .keyboard-key {
-    font-size: 10px;
-    min-height: 38px;
+    font-size: 9px;
+    min-height: 32px;
+    padding: 0 2px;
   }
 
-  /* 第一行: ` 1 2 3 4 5 6 7 8 9 0 - = BackSpace */
-  /* BackSpace: 4u = 112px */
-  .keyboard-87 .keyboard-key.wide-225 { width: 112px; }
+  /* Row 1: Esc(1.5u) + F1-F12(各1u) */
+  .keyboard-87 .keyboard-row:nth-child(1) .keyboard-key.w15  { width: 42px; }
 
-  /* 第二行: Tab q w e r t y u i o p [ ] \ */
-  /* Tab: 1.5u = 42px, \: 1.5u = 42px */
-  .keyboard-87 .keyboard-key.wide-05 { width: 42px; }
+  /* Row 2: 数字行 - BackSpace 2u = 56px */
+  .keyboard-87 .keyboard-row:nth-child(2) .keyboard-key.w2   { width: 56px; }
 
-  /* 第三行: Caps a s d f g h j k l ; ' Enter */
-  /* Caps: 2u = 56px, Enter: 5u = 140px */
-  .keyboard-87 .keyboard-key.wide-2 { width: 56px; }
-  .keyboard-87 .keyboard-key.wide-275 { width: 140px; }
+  /* Row 3: QWERTY - Tab 1.5u, \ 1.5u */
+  .keyboard-87 .keyboard-row:nth-child(3) .keyboard-key.w15  { width: 42px; }
 
-  /* 第四行: Shift z x c v b n m , . / Shift */
-  /* Shift_L: 4u = 112px, Shift_R: 5.5u = 154px */
-  /* wide-225 and wide-325 already defined above */
+  /* Row 4: ASDF - Caps 1.75u, Enter 2.25u */
+  .keyboard-87 .keyboard-row:nth-child(4) .keyboard-key.w175 { width: 49px; }
+  .keyboard-87 .keyboard-row:nth-child(4) .keyboard-key.w225 { width: 63px; }
 
-  /* 第五行: Ctrl Win Alt Space Alt Win Ctrl */
-  /* Ctrl: 1.5u = 42px, Win: 1.25u = 35px, Alt: 1.25u = 35px, Space: 6u = 168px */
-  .keyboard-87 .keyboard-key.wide-025 { width: 35px; }
+  /* Row 5: ZXCV - Shift_L 2.25u, Shift_R 2.75u */
+  .keyboard-87 .keyboard-row:nth-child(5) .keyboard-key.w225 { width: 63px; }
+  .keyboard-87 .keyboard-row:nth-child(5) .keyboard-key.w275 { width: 77px; }
 
-  /* 108键布局 */
+  /* Row 6: 空格 - Ctrl 1.5u, Win/Alt 1.25u, Space 6.25u, Fn 1.25u */
+  .keyboard-87 .keyboard-row:nth-child(6) .keyboard-key.w15  { width: 42px; }
+  .keyboard-87 .keyboard-row:nth-child(6) .keyboard-key.w125 { width: 35px; }
+  .keyboard-87 .keyboard-row:nth-child(6) .keyboard-key.w625 { width: 175px; }
+
+  /* Row 7-9: 编辑键 + 方向键 (全部 1.5u = 42px) */
+  .keyboard-87 .keyboard-row:nth-child(7) .keyboard-key,
+  .keyboard-87 .keyboard-row:nth-child(8) .keyboard-key,
+  .keyboard-87 .keyboard-row:nth-child(9) .keyboard-key {
+    width: 42px;
+  }
+
+  /* ========== 108键全尺寸布局 ========== */
+
   .keyboard-108 .keyboard-row {
     gap: 2px;
+    margin-bottom: 2px;
   }
 
   .keyboard-108 .keyboard-key {
-    font-size: 10px;
-    min-height: 38px;
+    font-size: 9px;
+    min-height: 32px;
+    padding: 0 2px;
   }
 
-  /* 第一行: ` 1 2 3 4 5 6 7 8 9 0 - = BackSpace */
-  /* BackSpace: 2u = 56px */
-  .keyboard-108 .keyboard-key.wide-2 { width: 56px; }
+  /* Row 1: 功能键 */
+  .keyboard-108 .keyboard-row:nth-child(1) .keyboard-key.w15 { width: 42px; }
 
-  /* 第二行: Tab q w e r t y u i o p [ ] \ */
-  /* Tab: 2u = 56px, \: 1.5u = 42px */
-  /* wide-2 and wide-05 already defined above */
+  /* Row 2: 数字行 - BackSpace 2u = 56px */
+  .keyboard-108 .keyboard-row:nth-child(2) .keyboard-key.w2 { width: 56px; }
 
-  /* 第三行: Caps a s d f g h j k l ; ' Enter */
-  /* Caps: 2u = 56px, Enter: 5u = 140px */
-  /* wide-2 and wide-275 already defined above */
+  /* Row 3: QWERTY - Tab 2u, \ 1.5u */
+  .keyboard-108 .keyboard-row:nth-child(3) .keyboard-key.w2   { width: 56px; }
+  .keyboard-108 .keyboard-row:nth-child(3) .keyboard-key.w15  { width: 42px; }
 
-  /* 第四行: Shift z x c v b n m , . / Shift */
-  /* Shift_L: 5u = 140px, Shift_R: 6u = 168px */
-  .keyboard-108 .keyboard-key.wide-275 { width: 140px; }
-  .keyboard-108 .keyboard-key.wide-35 { width: 168px; }
+  /* Row 4: ASDF - Caps 2u, Enter 2.25u */
+  .keyboard-108 .keyboard-row:nth-child(4) .keyboard-key.w2   { width: 56px; }
+  .keyboard-108 .keyboard-row:nth-child(4) .keyboard-key.w225 { width: 63px; }
+
+  /* Row 5: ZXCV - Shift_L 2.25u, Shift_R 2.75u */
+  .keyboard-108 .keyboard-row:nth-child(5) .keyboard-key.w225 { width: 63px; }
+  .keyboard-108 .keyboard-row:nth-child(5) .keyboard-key.w275 { width: 77px; }
+
+  /* Row 6: 空格 - Ctrl 1.5u, Alt 1.25u, Space 6.25u */
+  .keyboard-108 .keyboard-row:nth-child(6) .keyboard-key.w15  { width: 42px; }
+  .keyboard-108 .keyboard-row:nth-child(6) .keyboard-key.w125 { width: 35px; }
+  .keyboard-108 .keyboard-row:nth-child(6) .keyboard-key.w625 { width: 175px; }
+
+  /* Row 7-9: 编辑键 + 方向键 (全部 1.5u) */
+  .keyboard-108 .keyboard-row:nth-child(7) .keyboard-key,
+  .keyboard-108 .keyboard-row:nth-child(8) .keyboard-key,
+  .keyboard-108 .keyboard-row:nth-child(9) .keyboard-key {
+    width: 42px;
+  }
+
 
   /* 第五行: Ctrl Alt Space Alt Ctrl */
   /* Alt: 1.25u = 35px, Space: 6.25u = 175px */
@@ -1383,7 +1413,7 @@ const KEYBOARD_LAYOUTS = {
       // Row 1: 功能键 (Esc + F1-F12 = 13键)
       // Esc: 1.5u = 42px, Fn: 1.25u = 35px
       [
-        { key: 'Escape', label: 'Esc', width: 'wide-05' },
+        { key: 'Escape', label: 'Esc', width: 'w15' },
         { key: 'F1', label: 'F1' }, { key: 'F2', label: 'F2' }, { key: 'F3', label: 'F3' },
         { key: 'F4', label: 'F4' }, { key: 'F5', label: 'F5' }, { key: 'F6', label: 'F6' },
         { key: 'F7', label: 'F7' }, { key: 'F8', label: 'F8' }, { key: 'F9', label: 'F9' },
@@ -1395,61 +1425,61 @@ const KEYBOARD_LAYOUTS = {
         { key: '4', label: '4' }, { key: '5', label: '5' }, { key: '6', label: '6' },
         { key: '7', label: '7' }, { key: '8', label: '8' }, { key: '9', label: '9' },
         { key: '0', label: '0' }, { key: '-', label: '-' }, { key: '=', label: '=' },
-        { key: 'BackSpace', label: '←', width: 'wide-225' }
+        { key: 'BackSpace', label: '←', width: 'w2' }
       ],
-      // Row 3: QWERTY (Tab: 1.5u = 42px, \: 1.5u = 42px)
+      // Row 3: QWERTY (Tab: 1.5u, \: 1.5u)
       [
-        { key: 'Tab', label: 'Tab', width: 'wide-05' },
+        { key: 'Tab', label: 'Tab', width: 'w15' },
         { key: 'q', label: 'Q' }, { key: 'w', label: 'W' }, { key: 'e', label: 'E' }, { key: 'r', label: 'R' },
         { key: 't', label: 'T' }, { key: 'y', label: 'Y' }, { key: 'u', label: 'U' }, { key: 'i', label: 'I' },
         { key: 'o', label: 'O' }, { key: 'p', label: 'P' },
-        { key: '[', label: '[' }, { key: ']', label: ']' }, { key: '\\', label: '\\', width: 'wide-05' }
+        { key: '[', label: '[' }, { key: ']', label: ']' }, { key: '\\', label: '\\', width: 'w15' }
       ],
       // Row 4: ASDF (Caps: 2u = 56px, Enter: 5u = 140px)
       [
-        { key: 'Caps_Lock', label: 'Caps', width: 'wide-2' },
+        { key: 'Caps_Lock', label: 'Caps', width: 'w175' },
         { key: 'a', label: 'A' }, { key: 's', label: 'S' }, { key: 'd', label: 'D' }, { key: 'f', label: 'F' },
         { key: 'g', label: 'G' }, { key: 'h', label: 'H' }, { key: 'j', label: 'J' },
         { key: 'k', label: 'K' }, { key: 'l', label: 'L' },
-        { key: ';', label: ';' }, { key: "'", label: "'" }, { key: 'Enter', label: 'Enter', width: 'wide-275' }
+        { key: ';', label: ';' }, { key: "'", label: "'" }, { key: 'Enter', label: 'Enter', width: 'w225' }
       ],
       // Row 5: ZXCV (Shift_L: 4u = 112px, Shift_R: 5.5u = 154px)
       [
-        { key: 'Shift_L', label: 'Shift', width: 'wide-225' },
+        { key: 'Shift_L', label: 'Shift', width: 'w225' },
         { key: 'z', label: 'Z' }, { key: 'x', label: 'X' }, { key: 'c', label: 'C' }, { key: 'v', label: 'V' },
         { key: 'b', label: 'B' }, { key: 'n', label: 'N' }, { key: 'm', label: 'M' },
         { key: ',', label: ',' }, { key: '.', label: '.' }, { key: '/', label: '/' },
-        { key: 'Shift_R', label: 'Shift', width: 'wide-325' }
+        { key: 'Shift_R', label: 'Shift', width: 'w275' }
       ],
       // Row 6: 空格键 (Ctrl: 1.5u = 42px, Win/Alt: 1.25u = 35px, Space: 6u = 168px, Fn: 1.25u = 35px)
       [
-        { key: 'Control_L', label: 'Ctrl', width: 'wide-05' },
-        { key: 'Super_L', label: 'Win', width: 'wide-025' },
-        { key: 'Alt_L', label: 'Alt', width: 'wide-025' },
-        { key: ' ', label: '', width: 'wide-35' },
-        { key: 'Alt_R', label: 'Alt', width: 'wide-025' },
-        { key: 'Super_R', label: 'Win', width: 'wide-025' },
-        { key: 'Control_R', label: 'Ctrl', width: 'wide-05' },
-        { key: 'Fn', label: 'Fn', width: 'wide-025' }
+        { key: 'Control_L', label: 'Ctrl', width: 'w15' },
+        { key: 'Super_L', label: 'Win', width: 'w125' },
+        { key: 'Alt_L', label: 'Alt', width: 'w125' },
+        { key: ' ', label: '', width: 'w625' },
+        { key: 'Alt_R', label: 'Alt', width: 'w125' },
+        { key: 'Super_R', label: 'Win', width: 'w125' },
+        { key: 'Control_R', label: 'Ctrl', width: 'w15' },
+        { key: 'Fn', label: 'Fn', width: 'w125' }
       ],
       // Row 7: 编辑键区上排 (Insert + Home + PageUp) - 每键 1.5u = 42px
       [
-        { key: 'Insert', label: 'Ins', width: 'wide-05' },
-        { key: 'Home', label: 'Home', width: 'wide-05' },
-        { key: 'PageUp', label: 'PgUp', width: 'wide-05' }
+        { key: 'Insert', label: 'Ins', width: 'w15' },
+        { key: 'Home', label: 'Home', width: 'w15' },
+        { key: 'PageUp', label: 'PgUp', width: 'w15' }
       ],
       // Row 8: 编辑键区下排 (Delete + End + PageDown + ↑) - 每键 1.5u = 42px
       [
-        { key: 'Delete', label: 'Del', width: 'wide-05' },
-        { key: 'End', label: 'End', width: 'wide-05' },
-        { key: 'PageDown', label: 'PgDn', width: 'wide-05' },
-        { key: 'Up', label: '↑', width: 'wide-05' }
+        { key: 'Delete', label: 'Del', width: 'w15' },
+        { key: 'End', label: 'End', width: 'w15' },
+        { key: 'PageDown', label: 'PgDn', width: 'w15' },
+        { key: 'Up', label: '↑', width: 'w15' }
       ],
       // Row 9: 方向键区 (← + ↓ + →) - 每键 1.5u = 42px
       [
-        { key: 'Left', label: '←', width: 'wide-05' },
-        { key: 'Down', label: '↓', width: 'wide-05' },
-        { key: 'Right', label: '→', width: 'wide-05' }
+        { key: 'Left', label: '←', width: 'w15' },
+        { key: 'Down', label: '↓', width: 'w15' },
+        { key: 'Right', label: '→', width: 'w15' }
       ]
     ]
   },
@@ -1462,40 +1492,40 @@ const KEYBOARD_LAYOUTS = {
         { key: '4', label: '4' }, { key: '5', label: '5' }, { key: '6', label: '6' },
         { key: '7', label: '7' }, { key: '8', label: '8' }, { key: '9', label: '9' },
         { key: '0', label: '0' }, { key: '-', label: '-' }, { key: '=', label: '=' },
-        { key: 'BackSpace', label: '←', width: 'wide-2' }
+        { key: 'BackSpace', label: '←', width: 'w2' }
       ],
       // 第二行 (Tab: 2u = 56px, \: 1.5u = 42px)
       [
-        { key: 'Tab', label: 'Tab', width: 'wide-2' },
+        { key: 'Tab', label: 'Tab', width: 'w2' },
         { key: 'q', label: 'Q' }, { key: 'w', label: 'W' }, { key: 'e', label: 'E' }, { key: 'r', label: 'R' },
         { key: 't', label: 'T' }, { key: 'y', label: 'Y' }, { key: 'u', label: 'U' }, { key: 'i', label: 'I' },
         { key: 'o', label: 'O' }, { key: 'p', label: 'P' },
-        { key: '[', label: '[' }, { key: ']', label: ']' }, { key: '\\', label: '\\', width: 'wide-05' }
+        { key: '[', label: '[' }, { key: ']', label: ']' }, { key: '\\', label: '\\', width: 'w15' }
       ],
       // 第三行 (Caps: 2u = 56px, Enter: 5u = 140px)
       [
-        { key: 'Caps_Lock', label: 'Caps', width: 'wide-2' },
+        { key: 'Caps_Lock', label: 'Caps', width: 'w175' },
         { key: 'a', label: 'A' }, { key: 's', label: 'S' }, { key: 'd', label: 'D' }, { key: 'f', label: 'F' },
         { key: 'g', label: 'G' }, { key: 'h', label: 'H' }, { key: 'j', label: 'J' },
         { key: 'k', label: 'K' }, { key: 'l', label: 'L' },
         { key: ';', label: ';' }, { key: "'", label: "'" },
-        { key: 'Enter', label: 'Enter', width: 'wide-275' }
+        { key: 'Enter', label: 'Enter', width: 'w225' }
       ],
       // 第四行 (Shift_L: 5u = 140px, Shift_R: 6u = 168px)
       [
-        { key: 'Shift_L', label: 'Shift', width: 'wide-275' },
+        { key: 'Shift_L', label: 'Shift', width: 'w275' },
         { key: 'z', label: 'Z' }, { key: 'x', label: 'X' }, { key: 'c', label: 'C' }, { key: 'v', label: 'V' },
         { key: 'b', label: 'B' }, { key: 'n', label: 'N' }, { key: 'm', label: 'M' },
         { key: ',', label: ',' }, { key: '.', label: '.' }, { key: '/', label: '/' },
-        { key: 'Shift_R', label: 'Shift', width: 'wide-35' }
+        { key: 'Shift_R', label: 'Shift', width: 'w275' }
       ],
       // 第五行 (Alt: 1.25u = 35px, Space: 6.25u = 175px)
       [
-        { key: 'Control_L', label: 'Ctrl', width: 'wide-05' },
-        { key: 'Alt_L', label: 'Alt', width: 'wide-025' },
-        { key: ' ', label: '', width: 'wide-625' },
-        { key: 'Alt_R', label: 'Alt', width: 'wide-025' },
-        { key: 'Control_R', label: 'Ctrl', width: 'wide-05' }
+        { key: 'Control_L', label: 'Ctrl', width: 'w15' },
+        { key: 'Alt_L', label: 'Alt', width: 'w125' },
+        { key: ' ', label: '', width: 'w625' },
+        { key: 'Alt_R', label: 'Alt', width: 'w125' },
+        { key: 'Control_R', label: 'Ctrl', width: 'w15' }
       ]
     ]
   }
