@@ -1,0 +1,1316 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<title>keyword-logger</title>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --bg-subtle: #0d0e14;
+    --panel: rgba(19, 20, 31, 0.85);
+    --border: rgba(26, 27, 46, 0.6);
+    --text: #c0caf5;
+    --text-bright: #ffffff;
+    --muted: #565f89;
+    --accent: #7aa2f7;
+    --accent-glow: rgba(122, 162, 247, 0.15);
+    --accent-2: #2f3a6b;
+    --green: #9ece6a;
+    --purple: #bb9af7;
+    --teal: #7dcfff;
+    --red: #f7768e;
+    --orange: #ff9e64;
+    --bar-bg: #1a1b2e;
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+    --shadow-glow: 0 0 40px rgba(122, 162, 247, 0.1);
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 13px/1.6 'JetBrains Mono','SF Mono','Fira Code','Cascadia Code',ui-monospace,monospace;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background:
+      radial-gradient(ellipse at 20% 20%, rgba(122, 162, 247, 0.03) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(187, 154, 247, 0.03) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--panel);
+    backdrop-filter: blur(12px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: var(--shadow-sm);
+  }
+  header h1 {
+    margin: 0; font-size: 15px; font-weight: 700; color: var(--accent);
+    display: flex; align-items: center; gap: 10px;
+    letter-spacing: 0.02em;
+  }
+  header h1::before {
+    content: "";
+    display: inline-block;
+    width: 8px; height: 8px;
+    background: var(--accent);
+    box-shadow: 0 0 12px var(--accent);
+    border-radius: 2px;
+  }
+  header .meta { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 11px; }
+  header .live-dot {
+    display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--green); margin-right: 2px;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+  .meta a { color: var(--muted); text-decoration: none; }
+  .meta a:hover { color: var(--accent); }
+
+  main {
+    padding: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .alpha-stats-row {
+    display: flex;
+    margin-bottom: 20px;
+    animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .alpha-stats-row .stat-card {
+    flex: 1;
+    max-width: 300px;
+    background: linear-gradient(135deg, rgba(122, 162, 247, 0.1), rgba(187, 154, 247, 0.08));
+    border-color: rgba(122, 162, 247, 0.3);
+  }
+  .alpha-stats-row .stat-card::before {
+    opacity: 1;
+    background: linear-gradient(90deg, var(--accent), var(--purple));
+  }
+  .stat-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(8px);
+  }
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--purple));
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .stat-card:hover {
+    border-color: rgba(122, 162, 247, 0.3);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md), var(--shadow-glow);
+  }
+  .stat-card:hover::before { opacity: 1; }
+  .stat-card.primary {
+    grid-column: span 2;
+    background: linear-gradient(135deg, rgba(122, 162, 247, 0.08), rgba(187, 154, 247, 0.05));
+  }
+  .stat-card .label {
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+  .stat-card .value {
+    font-size: 32px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.2;
+    background: linear-gradient(135deg, var(--text-bright), var(--text));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .stat-card .value.green {
+    background: linear-gradient(135deg, var(--green), #7cb342);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+  .stat-card .value.accent {
+    background: linear-gradient(135deg, var(--accent), var(--teal));
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+  .stat-card .value.teal {
+    background: linear-gradient(135deg, var(--teal), #4dd0e1);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+  .stat-card .value.purple {
+    background: linear-gradient(135deg, var(--purple), #ce93d8);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+  .stat-card .sub {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 6px;
+    line-height: 1.4;
+  }
+
+  .gran-select {
+    display: flex; gap: 8px; margin-bottom: 20px; align-items: center; flex-wrap: wrap;
+  }
+  .gran-select .label {
+    color: var(--muted); font-size: 11px; letter-spacing: 0.06em; margin-right: 8px;
+    font-weight: 500;
+  }
+  .gran-select button {
+    background: var(--panel);
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 16px;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+  .gran-select button::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--accent), var(--purple));
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .gran-select button span {
+    position: relative;
+    z-index: 1;
+  }
+  .gran-select button:hover {
+    color: var(--text);
+    border-color: var(--accent-2);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+  }
+  .gran-select button.active {
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: var(--bg);
+    border-color: var(--accent);
+    font-weight: 600;
+    box-shadow: 0 0 20px rgba(122, 162, 247, 0.3);
+  }
+
+  .chart {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+    backdrop-filter: blur(8px);
+    box-shadow: var(--shadow-md);
+    transition: box-shadow 0.3s;
+  }
+  .chart:hover {
+    box-shadow: var(--shadow-lg), var(--shadow-glow);
+  }
+  .chart .chart-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 20px; font-size: 11px; color: var(--muted);
+    letter-spacing: 0.06em;
+    font-weight: 500;
+  }
+  .chart-header .range {
+    letter-spacing: 0;
+    font-weight: 400;
+    opacity: 0.7;
+  }
+  .chart-bars {
+    display: flex;
+    gap: 4px;
+    height: 120px;
+    align-items: flex-end;
+    position: relative;
+  }
+  .chart-bar {
+    flex: 1;
+    min-width: 4px;
+    position: relative;
+    cursor: pointer;
+    background: linear-gradient(180deg, var(--accent), var(--accent-2));
+    border-radius: 6px 6px 0 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: bottom;
+  }
+  .chart-bar:hover {
+    opacity: 1;
+    transform: scaleY(1.05);
+    filter: brightness(1.2);
+    box-shadow: 0 0 20px rgba(122, 162, 247, 0.4);
+  }
+  .chart-bar .tip {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 12px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(17, 19, 31, 0.95);
+    border: 1px solid var(--border);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 11px;
+    white-space: nowrap;
+    z-index: 10;
+    color: var(--text);
+    pointer-events: none;
+    backdrop-filter: blur(8px);
+    box-shadow: var(--shadow-md);
+  }
+  .chart-bar .tip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: var(--border);
+  }
+  .chart-bar:hover .tip { display: block; }
+  .chart-empty { color: var(--muted); font-size: 12px; padding: 32px 0; text-align: center; }
+
+  .app-table {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    backdrop-filter: blur(8px);
+    box-shadow: var(--shadow-md);
+    transition: box-shadow 0.3s;
+  }
+  .app-table:hover {
+    box-shadow: var(--shadow-lg);
+  }
+  .app-table .table-header {
+    display: flex; align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    text-transform: uppercase;
+    background: rgba(122, 162, 247, 0.02);
+  }
+  .app-table .table-header .col-rank { width: 28px; }
+  .app-table .table-header .col-name { flex: 1; }
+  .app-table .table-header .col-keys { width: 72px; text-align: right; }
+  .app-table .table-header .col-bar { width: 72px; text-align: right; }
+
+  .app-row {
+    display: flex; align-items: center;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+    color: inherit;
+    position: relative;
+  }
+  .app-row:last-child { border-bottom: none; }
+  .app-row::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, var(--accent), var(--purple));
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .app-row:hover {
+    background: linear-gradient(90deg, var(--accent-glow), transparent);
+  }
+  .app-row:hover::before { opacity: 1; }
+  .app-row .col-rank {
+    width: 32px;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .app-row .col-name {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    overflow: hidden;
+  }
+  .app-row .col-name .app-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    box-shadow: 0 0 8px currentColor;
+  }
+  .app-row .col-name .app-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 500;
+    font-size: 13px;
+  }
+  .app-row .col-keys {
+    width: 80px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent);
+  }
+  .app-row .col-bar { width: 100px; text-align: right; }
+  .app-row .col-bar .bar-track {
+    display: inline-block;
+    width: 72px;
+    height: 8px;
+    background: var(--bar-bg);
+    border-radius: 4px;
+    overflow: hidden;
+    vertical-align: middle;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+  .app-row .col-bar .bar-track .bar-fill {
+    display: inline-block;
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    /* 移除 background 声明，完全依赖内联样式 */
+  }
+  .app-row .col-bar .bar-track .bar-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    animation: shimmer 2s infinite;
+    z-index: 1;
+    pointer-events: none;
+  }
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
+  .dot-0 { background: var(--accent); box-shadow: 0 0 8px rgba(122, 162, 247, 0.5); }
+  .dot-1 { background: var(--purple); box-shadow: 0 0 8px rgba(187, 154, 247, 0.5); }
+  .dot-2 { background: var(--green); box-shadow: 0 0 8px rgba(158, 206, 106, 0.5); }
+  .dot-3 { background: var(--orange); box-shadow: 0 0 8px rgba(255, 158, 100, 0.5); }
+  .dot-4 { background: var(--teal); box-shadow: 0 0 8px rgba(125, 207, 255, 0.5); }
+  .dot-5 { background: var(--red); box-shadow: 0 0 8px rgba(247, 118, 142, 0.5); }
+  .dot-6 { background: #73daca; box-shadow: 0 0 8px rgba(115, 218, 202, 0.5); }
+  .dot-7 { background: #ff9e64; box-shadow: 0 0 8px rgba(255, 158, 100, 0.5); }
+  .dot-8 { background: #9ece6a; box-shadow: 0 0 8px rgba(158, 206, 106, 0.5); }
+  .dot-9 { background: #e0af68; box-shadow: 0 0 8px rgba(224, 175, 104, 0.5); }
+
+  .key-table {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    backdrop-filter: blur(8px);
+    box-shadow: var(--shadow-md);
+  }
+
+  /* 字母统计模块 */
+  .alpha-stats-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    backdrop-filter: blur(8px);
+    box-shadow: var(--shadow-md);
+    padding: 24px;
+    animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .alpha-stats-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .alpha-stats-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.02em;
+  }
+  .alpha-stats-badge {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--bg);
+    background: linear-gradient(135deg, var(--accent), var(--purple));
+    padding: 4px 12px;
+    border-radius: 12px;
+    letter-spacing: 0.04em;
+  }
+  .alpha-stats-body {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .alpha-stat-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px;
+    background: rgba(122, 162, 247, 0.04);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    transition: all 0.2s;
+  }
+  .alpha-stat-item:hover {
+    background: rgba(122, 162, 247, 0.08);
+    border-color: var(--accent-2);
+    transform: translateY(-2px);
+  }
+  .alpha-stat-label {
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 500;
+  }
+  .alpha-stat-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+  }
+  .alpha-freq-section {
+    margin-top: 20px;
+  }
+  .alpha-freq-header {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+  }
+  .alpha-freq-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .alpha-freq-row {
+    display: grid;
+    grid-template-columns: 40px 60px 1fr 60px;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    transition: background 0.15s;
+  }
+  .alpha-freq-row:hover {
+    background: rgba(122, 162, 247, 0.04);
+  }
+  .alpha-letter {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--accent);
+    text-align: center;
+    text-transform: uppercase;
+  }
+  .alpha-count {
+    font-size: 12px;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+  .alpha-bar-track {
+    width: 100%;
+    height: 8px;
+    background: var(--bar-bg);
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+  .alpha-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    border-radius: 4px;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+  .alpha-bar-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    animation: shimmer 2.5s infinite;
+  }
+  .alpha-pct {
+    font-size: 11px;
+    color: var(--muted);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .key-table .table-header {
+    display: flex; align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    text-transform: uppercase;
+    background: rgba(122, 162, 247, 0.02);
+  }
+  .key-table .table-header .col-key { flex: 1; }
+  .key-table .table-header .col-count { width: 72px; text-align: right; }
+  .key-table .table-header .col-pct { width: 52px; text-align: right; }
+  .key-table .table-header .col-bar { width: 72px; text-align: right; }
+
+  .key-row {
+    display: flex; align-items: center;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .key-row:last-child { border-bottom: none; }
+  .key-row:hover {
+    background: linear-gradient(90deg, rgba(122, 162, 247, 0.04), transparent);
+  }
+  .key-row .col-key {
+    flex: 1;
+    color: var(--text);
+    font-size: 13px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 500;
+  }
+  .key-row .col-key .key-mod { color: var(--orange); font-weight: 600; }
+  .key-row .col-key .key-regular { color: var(--green); }
+  .key-row .col-key .key-nav { color: var(--purple); font-weight: 600; }
+  .key-row .col-key .key-alpha {
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 14px;
+    text-transform: uppercase;
+  }
+  .key-row .col-count {
+    width: 80px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .key-row .col-pct {
+    width: 60px;
+    text-align: right;
+    color: var(--muted);
+    font-size: 12px;
+  }
+  .key-row .col-bar { width: 80px; text-align: right; }
+  .key-row .col-bar .bar-track {
+    display: inline-block;
+    width: 64px;
+    height: 6px;
+    background: var(--bar-bg);
+    border-radius: 3px;
+    overflow: hidden;
+    vertical-align: middle;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
+  }
+  .key-row .col-bar .bar-track .bar-fill {
+    display: inline-block;
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+  .key-row .col-bar .bar-track .bar-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    animation: shimmer 2.5s infinite;
+  }
+
+  .back-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    color: var(--muted); text-decoration: none; font-size: 12px;
+    margin-bottom: 20px; margin-right: 16px;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, rgba(122, 162, 247, 0.08), rgba(187, 154, 247, 0.05));
+    border: 1px solid rgba(122, 162, 247, 0.2);
+    position: relative;
+    overflow: hidden;
+  }
+  .back-link::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, var(--accent), var(--purple));
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+  .back-link span {
+    position: relative;
+    z-index: 1;
+  }
+  .back-link:hover {
+    color: var(--bg);
+    border-color: var(--accent);
+    transform: translateX(-6px);
+    box-shadow: 0 0 24px rgba(122, 162, 247, 0.4), var(--shadow-md);
+  }
+  .back-link:hover::before {
+    opacity: 1;
+  }
+  .back-link:active {
+    transform: translateX(-4px) scale(0.98);
+  }
+
+  #err {
+    color: var(--red);
+    padding: 12px 24px;
+    font-size: 12px;
+    background: rgba(247, 118, 142, 0.08);
+    border-left: 3px solid var(--red);
+    margin: 16px 24px;
+    border-radius: 6px;
+    backdrop-filter: blur(8px);
+    display: none;
+  }
+  .empty {
+    color: var(--muted);
+    padding: 48px 24px;
+    text-align: center;
+    font-size: 13px;
+    background: var(--panel);
+    border: 1px dashed var(--border);
+    border-radius: 12px;
+    margin: 16px 0;
+  }
+
+  ::-webkit-scrollbar { width: 10px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 5px;
+    border: 2px solid var(--bg);
+  }
+  ::-webkit-scrollbar-thumb:hover { background: var(--accent-2); }
+
+  .fade-in {
+    animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .chart-bar, .stat-card, .app-row, .key-row {
+    will-change: transform, opacity;
+  }
+
+  @media (max-width: 768px) {
+    main { padding: 16px; }
+    .stats-row {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    .stat-card.primary {
+      grid-column: span 1;
+    }
+    .stat-card .value {
+      font-size: 28px;
+    }
+    .alpha-stats-row {
+      flex-direction: column;
+    }
+    .alpha-stats-row .stat-card {
+      max-width: none;
+    }
+    .alpha-stats-body {
+      grid-template-columns: 1fr;
+    }
+    .alpha-freq-row {
+      grid-template-columns: 30px 50px 1fr 50px;
+      gap: 8px;
+    }
+    .alpha-letter {
+      font-size: 14px;
+    }
+    .alpha-count {
+      font-size: 11px;
+    }
+    .alpha-pct {
+      font-size: 10px;
+    }
+    .alpha-bar-track {
+      height: 6px;
+    }
+    .chart-bars {
+      height: 80px;
+    }
+    .app-table .table-header,
+    .app-row,
+    .key-table .table-header,
+    .key-row {
+      padding: 12px 16px;
+    }
+    .app-row .col-keys,
+    .key-row .col-count {
+      width: 60px;
+    }
+    .app-row .col-bar,
+    .key-row .col-bar {
+      width: 60px;
+    }
+    .app-row .col-bar .bar-track,
+    .key-row .col-bar .bar-track {
+      width: 48px;
+    }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>keyword-logger</h1>
+  <div class="meta">
+    <span id="since"></span>
+    <a id="back" class="back-link" href="/"><span>← 返回总览</span></a>
+    <span style="display: flex; align-items: center; gap: 8px;">
+      <span class="live-dot"></span>
+      <span id="updated"></span>
+    </span>
+  </div>
+</header>
+<div id="err"></div>
+<main>
+  <div class="stats-row" id="statsRow"></div>
+  <div class="gran-select" id="granSelect">
+    <span class="label">趋势</span>
+    <button data-g="" class="active">关闭</button>
+    <button data-g="hour">时</button>
+    <button data-g="day">天</button>
+    <button data-g="week">周</button>
+    <button data-g="month">月</button>
+    <button data-g="year">年</button>
+  </div>
+  <div id="chart"></div>
+  <div id="content"></div>
+</main>
+
+<script>
+// 全局错误处理器
+window.onerror = function(msg, url, line, col, error) {
+  console.error('Error:', { msg, url, line, col, error });
+  return false;
+};
+
+// 未捕获的 Promise  rejection
+window.onunhandledrejection = function(event) {
+  console.error('Unhandled Promise rejection:', event.reason);
+};
+
+const escapeHtml = (s) => String(s)
+  .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+  .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+
+const params = new URLSearchParams(location.search);
+const appFilter = params.get("app") || "";
+const backLink = document.getElementById("back");
+backLink.style.display = appFilter ? "inline-flex" : "none";
+
+let state = { granularity: "" };
+let lastData = null;
+let lastStats = null;  // { total, appCount, topApp, topCount }
+let lastAppsKey = "";  // 应用列表的签名，用于判断是否需要重绘
+
+document.querySelectorAll("#granSelect button").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll("#granSelect button").forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+    state.granularity = btn.dataset.g;
+    refresh();
+  });
+});
+
+// 键盘快捷键：ESC 返回总览
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && appFilter) {
+    window.location.href = "/";
+  }
+});
+
+function formatNum(n) {
+  return n.toLocaleString();
+}
+
+// 数字滚动动画
+function animateNumber(el, from, to, duration = 600) {
+  const start = performance.now();
+  const diff = to - from;
+
+  function update(now) {
+    const elapsed = now - start;
+    const progress = Math.min(elapsed / duration, 1);
+    // ease-out cubic
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const current = Math.round(from + diff * eased);
+    el.textContent = formatNum(current);
+
+    if (progress < 1) {
+      requestAnimationFrame(update);
+    }
+  }
+
+  requestAnimationFrame(update);
+}
+
+// 深度对比两个数据对象，返回是否有变化
+function dataChanged(a, b) {
+  if (!a || !b) return true;
+  return JSON.stringify(a) !== JSON.stringify(b);
+}
+
+function getDotClass(i) {
+  return "dot-" + (i % 10);
+}
+
+const COLORS = ["#7aa2f7","#bb9af7","#9ece6a","#ff9e64","#7dcfff","#f7768e","#73daca","#ff9e64","#9ece6a","#e0af68"];
+
+async function refresh() {
+  const q = new URLSearchParams();
+  if (appFilter) q.set("app", appFilter);
+  if (state.granularity) q.set("granularity", state.granularity);
+  const url = "/stats" + (q.toString() ? "?" + q.toString() : "");
+  try {
+    const r = await fetch(url, { cache: "no-store" });
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    const data = await r.json();
+    render(data);
+    const errEl = document.getElementById("err");
+    if (errEl.textContent) errEl.style.display = "none";
+  } catch (e) {
+    console.error('Refresh failed:', e);
+    const errEl = document.getElementById("err");
+    errEl.textContent = "▸ 请求失败: " + e.message;
+    errEl.style.display = "block";
+  }
+}
+
+function render(data) {
+  // 数据未变化则跳过
+  if (!dataChanged(lastData, data)) {
+    return;
+  }
+  lastData = JSON.parse(JSON.stringify(data));
+
+  document.getElementById("since").textContent = "始于 " + data.started_at;
+
+  // 增量更新 updated_at（不闪烁）
+  const updatedEl = document.getElementById("updated");
+  if (updatedEl.textContent !== (data.updated_at || "—")) {
+    updatedEl.style.opacity = "0";
+    setTimeout(() => {
+      updatedEl.textContent = data.updated_at || "—";
+      updatedEl.style.transition = "opacity 0.3s";
+      updatedEl.style.opacity = "1";
+    }, 150);
+  }
+  document.getElementById("since").style.fontWeight = "500";
+
+  const apps = Object.entries(data.apps || {})
+    .sort((a, b) => b[1].total - a[1].total);
+
+  const root = document.getElementById("content");
+
+  if (apps.length === 0) {
+    root.innerHTML = '<div class="empty">暂未记录到按键</div>';
+    return;
+  }
+
+  // 局部刷新各模块
+  renderStats(data);
+  renderChart(data);
+
+  if (appFilter) {
+    renderKeys(root, apps);
+  } else {
+    renderApps(root, apps);
+  }
+}
+
+function renderStats(data) {
+  const apps = Object.entries(data.apps || {}).sort((a, b) => b[1].total - a[1].total);
+  const topApp = apps[0] ? apps[0][0] : "—";
+  const topCount = apps[0] ? apps[0][1].total : 0;
+
+  // 计算当前 stats 的签名
+  const currStats = {
+    total: data.total,
+    appCount: apps.length,
+    topApp,
+    topCount
+  };
+  const currKey = JSON.stringify(currStats);
+
+  // 如果没变化，跳过
+  if (lastStats && lastAppsKey === currKey) {
+    return;
+  }
+
+  // 局部更新数字（带动画）
+  const row = document.getElementById("statsRow");
+  if (!row.children.length) {
+    // 首次渲染，完整生成
+    row.innerHTML = `
+      <div class="stat-card">
+        <div class="label">总按键</div>
+        <div class="value accent" data-stat="total">${formatNum(data.total)}</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">应用数</div>
+        <div class="value green" data-stat="apps">${apps.length}</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">最活跃应用</div>
+        <div class="value teal" style="font-size:14px;font-weight:600" data-stat="topApp">${escapeHtml(topApp)}</div>
+        <div class="sub" data-stat="topCount">${formatNum(topCount)} 次</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">版本</div>
+        <div class="value purple">v${data.version}</div>
+        <div class="sub">${data.updated_at ? "运行中" : "—"}</div>
+      </div>`;
+  } else {
+    // 增量更新：只更新变化的部分
+    const totalEl = row.querySelector('[data-stat="total"]');
+    const appsEl = row.querySelector('[data-stat="apps"]');
+    const topAppEl = row.querySelector('[data-stat="topApp"]');
+    const topCountEl = row.querySelector('[data-stat="topCount"]');
+
+    if (totalEl && lastStats.total !== data.total) {
+      animateNumber(totalEl, lastStats.total, data.total);
+    }
+    if (appsEl && lastStats.appCount !== apps.length) {
+      animateNumber(appsEl, lastStats.appCount, apps.length);
+    }
+    if (topAppEl && lastStats.topApp !== topApp) {
+      topAppEl.textContent = topApp;
+    }
+    if (topCountEl && lastStats.topCount !== topCount) {
+      animateNumber(topCountEl, lastStats.topCount, topCount);
+    }
+  }
+
+  lastStats = currStats;
+}
+
+function renderChart(data) {
+  const root = document.getElementById("chart");
+  const buckets = data.buckets || [];
+
+  if (!state.granularity) {
+    root.innerHTML = "";
+    return;
+  }
+
+  if (buckets.length === 0) {
+    root.innerHTML = `<div class="chart">
+      <div class="chart-header"><span>${state.granularity}</span></div>
+      <div class="chart-empty">该时间范围内暂无数据</div>
+    </div>`;
+    return;
+  }
+
+  const max = buckets.reduce((m, b) => Math.max(m, b.count), 1);
+  const head = data.granularity || state.granularity;
+  const first = buckets[0].start, last = buckets[buckets.length - 1].start;
+  const granLabels = { hour: "时", day: "天", week: "周", month: "月", year: "年" };
+  const headLabel = granLabels[head] || head;
+
+  // 计算当前图表签名
+  const chartKey = `${headLabel}|${first}|${last}|${buckets.length}|${buckets.map(b => `${b.start}:${b.count}`).join(",")}`;
+
+  // 如果图表已存在且数据未变化，跳过
+  const existingChart = root.querySelector(".chart-bars");
+  if (existingChart && existingChart.dataset.chartKey === chartKey) {
+    return;
+  }
+
+  // 淡入更新
+  const chartHtml = `<div class="chart fade-in">
+    <div class="chart-header">
+      <span>${headLabel}</span>
+      <span class="range">${escapeHtml(first)} → ${escapeHtml(last)} · ${buckets.length} 个区间</span>
+    </div>
+    <div class="chart-bars" data-chart-key="${chartKey}">${buckets.map((b) => {
+      const h = (b.count / max * 100).toFixed(1);
+      const barH = Math.round(b.count / max * 80);
+      return `<div class="chart-bar" title="${escapeHtml(b.start)}: ${b.count}" style="height:${barH}px">
+        <div class="tip">${escapeHtml(b.start)}: <strong>${b.count}</strong></div>
+      </div>`;
+    }).join("")}</div>
+  </div>`;
+
+  // 平滑过渡：先淡出，再更新，再淡入
+  if (existingChart) {
+    root.style.opacity = "0.6";
+    root.style.transition = "opacity 0.15s";
+    setTimeout(() => {
+      root.innerHTML = chartHtml;
+      root.style.opacity = "1";
+    }, 150);
+  } else {
+    root.innerHTML = chartHtml;
+  }
+}
+
+function renderApps(root, apps) {
+
+  // 计算签名
+  const signature = apps.map(([name, s]) => `${name}:${s.total}`).join("|");
+
+  // 如果列表已存在且未变化，只更新数字（不重绘整个列表）
+  const existingTable = root.querySelector(".app-table");
+  if (existingTable && existingTable.dataset.appsSig === signature) {
+    // 增量更新数字
+    const rows = existingTable.querySelectorAll(".app-row");
+    rows.forEach((row, i) => {
+      const [name, stats] = apps[i];
+      if (!name) return;
+      const countEl = row.querySelector(".col-keys");
+      const barFill = row.querySelector(".bar-fill");
+      if (countEl) {
+        const currCount = parseInt(countEl.textContent.replace(/,/g, "")) || 0;
+        if (currCount !== stats.total) {
+          animateNumber(countEl, currCount, stats.total, 400);
+        }
+      }
+      if (barFill) {
+        const pct = (stats.total / apps[0][1].total * 100).toFixed(1);
+        const color = COLORS[i % COLORS.length];
+        barFill.style.width = pct + "%";
+        barFill.style.background = color;
+      }
+    });
+    return;
+  }
+
+  const maxTotal = apps[0][1].total;
+
+  root.innerHTML = `<div class="app-table fade-in" data-apps-sig="${signature}">
+    <div class="table-header">
+      <span class="col-rank">#</span>
+      <span class="col-name">应用</span>
+      <span class="col-keys">按键数</span>
+      <span class="col-bar">占比</span>
+    </div>
+    ${apps.map(([name, s], i) => {
+      const pct = (s.total / maxTotal * 100).toFixed(1);
+      return `<a href="/app?app=${encodeURIComponent(name)}" class="app-row">
+        <span class="col-rank">${i + 1}</span>
+        <span class="col-name">
+          <span class="app-dot ${getDotClass(i)}"></span>
+          <span class="app-label">${escapeHtml(name)}</span>
+        </span>
+        <span class="col-keys">${formatNum(s.total)}</span>
+        <span class="col-bar">
+          <span class="bar-track"><span class="bar-fill" style="width:${pct}%;background:${COLORS[i % COLORS.length]}"></span></span>
+        </span>
+      </a>`;
+    }).join("")}
+  </div>`;
+}
+
+function classifyKey(k) {
+  const appData = apps[0];
+  if (!appData) {
+    root.innerHTML = '<div class="empty">该应用暂无数据</div>';
+    return;
+  }
+  const [, s] = appData;
+  const keys = Object.entries(s.keys || {}).sort((a, b) => b[1] - a[1]);
+  const maxCount = keys.length ? keys[0][1] : 1;
+
+  // 计算字母键统计
+  const alphaKeys = keys.filter(([k, _]) => /^[A-Za-z]$/.test(k));
+  const alphaTotal = alphaKeys.reduce((sum, [_, v]) => sum + v, 0);
+  const alphaCount = alphaKeys.length;
+  const alphaPct = alphaTotal > 0 ? (alphaTotal / s.total * 100).toFixed(1) : "0.0";
+
+  // 计算字母使用频率分布（A-Z）
+  const alphaFreq = {};
+  for (let i = 0; i < 26; i++) {
+    alphaFreq[String.fromCharCode(65 + i)] = 0; // A-Z
+  }
+  alphaKeys.forEach(([k, v]) => {
+    const upper = k.toUpperCase();
+    if (alphaFreq[upper] !== undefined) {
+      alphaFreq[upper] += v;
+    }
+  });
+
+  const maxAlphaFreq = Math.max(...Object.values(alphaFreq), 1);
+
+  // 构建字母频率分布条 HTML
+  const alphaFreqHtml = Object.entries(alphaFreq)
+    .sort((a, b) => b[1] - a[1])
+    .map(([letter, count]) => {
+      const barWidth = (count / maxAlphaFreq * 100).toFixed(1);
+      const pct = count > 0 ? (count / alphaTotal * 100).toFixed(1) : "0.0";
+      return `<div class="alpha-freq-row">
+        <span class="alpha-letter">${letter}</span>
+        <span class="alpha-count">${formatNum(count)}</span>
+        <div class="alpha-bar-track">
+          <div class="alpha-bar-fill" style="width:${barWidth}%"></div>
+        </div>
+        <span class="alpha-pct">${pct}%</span>
+      </div>`;
+    }).join("");
+
+  // 构建字母统计卡片 HTML
+  let alphaStatsHtml = '';
+  if (alphaCount > 0) {
+    alphaStatsHtml = `
+      <div class="alpha-stats-card">
+        <div class="alpha-stats-header">
+          <span class="alpha-stats-title">字母按键统计</span>
+          <span class="alpha-stats-badge">${alphaCount} 个字母</span>
+        </div>
+        <div class="alpha-stats-body">
+          <div class="alpha-stat-item">
+            <span class="alpha-stat-label">总次数</span>
+            <span class="alpha-stat-value">${formatNum(alphaTotal)}</span>
+          </div>
+          <div class="alpha-stat-item">
+            <span class="alpha-stat-label">占总按键</span>
+            <span class="alpha-stat-value">${alphaPct}%</span>
+          </div>
+          <div class="alpha-stat-item">
+            <span class="alpha-stat-label">最高频</span>
+            <span class="alpha-stat-value">${alphaFreqHtml ? Object.entries(alphaFreq).sort((a, b) => b[1] - a[1])[0][0] : '—'}</span>
+          </div>
+        </div>
+        <div class="alpha-freq-section">
+          <div class="alpha-freq-header">频率分布</div>
+          <div class="alpha-freq-grid">
+            ${alphaFreqHtml}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // 计算当前按键列表签名
+  const keysSig = keys.map(([k, v]) => `${k}:${v}`).join("|");
+
+  // 如果列表已存在且未变化，增量更新数字
+  const existingTable = root.querySelector(".key-table");
+  if (existingTable && existingTable.dataset.keysSig === keysSig) {
+    // 增量更新字母统计卡片（如果存在）
+    const alphaTotalEl = root.querySelector(".alpha-stat-value");
+    if (alphaTotalEl) {
+      const currTotal = parseInt(alphaTotalEl.textContent.replace(/,/g, "")) || 0;
+      if (currTotal !== alphaTotal) {
+        animateNumber(alphaTotalEl, currTotal, alphaTotal, 400);
+      }
+    }
+    return;
+  }
+
+  root.innerHTML = alphaStatsHtml + `
+    <div class="key-table fade-in" data-keys-sig="${keysSig}" style="margin-top: 20px;">
+    <div class="table-header">
+      <span class="col-key">按键</span>
+      <span class="col-count">次数</span>
+      <span class="col-pct">占比</span>
+      <span class="col-bar">分布</span>
+    </div>
+    ${keys.map(([k, v]) => {
+      const pct = (v / s.total * 100).toFixed(1);
+      const barPct = (v / maxCount * 100).toFixed(1);
+      const cls = classifyKey(k);
+      return `<div class="key-row">
+        <span class="col-key"><span class="${cls}">${escapeHtml(k)}</span></span>
+        <span class="col-count">${formatNum(v)}</span>
+        <span class="col-pct">${pct}%</span>
+        <span class="col-bar">
+          <span class="bar-track"><span class="bar-fill" style="width:${barPct}%;background:var(--accent)"></span></span>
+        </span>
+      </div>`;
+    }).join("")}
+  </div>`;
+
+  // 调试：检查渲染结果
+
+  // 验证 bar-fill 是否被正确渲染
+  const barFills = root.querySelectorAll('.bar-fill');
+  if (barFills.length > 0) {
+  }
+}
+
+refresh();
+setInterval(refresh, 5000);
+</script>
+</body>
+</html>

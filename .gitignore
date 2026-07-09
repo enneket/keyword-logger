@@ -1,0 +1,43 @@
+# Binaries
+keyword-logger
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary
+*.test
+
+# Output
+*.out
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build
+dist/
+build/
+
+# Temporary files
+/tmp/
+*.tmp
+
+# Logs
+*.log
+/keyword-logger.log
+
+# Claude
+.claude/
+.superpowers/
+
+# Code Review Graph
+.code-review-graph/
