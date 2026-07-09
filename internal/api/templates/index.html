@@ -860,90 +860,133 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--bar-bg);
-    border: 1px solid var(--border);
+    background: rgba(26, 27, 46, 0.4);
+    border: 1px solid rgba(60, 65, 100, 0.5);
     border-radius: 6px;
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 600;
     color: var(--text);
     transition: all 0.2s;
     cursor: default;
-    min-height: 36px;
+    min-height: 40px;
     position: relative;
     overflow: hidden;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
   }
 
   .keyboard-key::before {
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: linear-gradient(135deg, rgba(255, 158, 100, 0.8), rgba(247, 118, 100, 0.6));
+    background: linear-gradient(135deg, rgba(255, 158, 100, 0.9), rgba(247, 118, 100, 0.7));
     opacity: 0;
     transition: opacity 0.2s;
+    z-index: 0;
   }
 
   .keyboard-key.pressed::before {
-    opacity: calc(var(--intensity, 0) * 0.8 + 0.2);
+    opacity: calc(var(--intensity, 0));
   }
 
   .keyboard-key.pressed {
-    border-color: rgba(255, 158, 100, 0.6);
-    box-shadow: 0 0 12px rgba(255, 158, 100, 0.3);
+    border-color: rgba(255, 158, 100, 0.8);
+    box-shadow: 0 0 20px rgba(255, 158, 100, 0.5), inset 0 1px 2px rgba(0, 0, 0, 0.3);
   }
 
   .keyboard-key .key-label {
     position: relative;
     z-index: 1;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
   }
 
   .keyboard-key .key-count {
     position: absolute;
     bottom: 2px;
     right: 4px;
-    font-size: 8px;
+    font-size: 9px;
     color: var(--muted);
     z-index: 1;
+    font-weight: 500;
   }
+
+  /* 统一单位: 1u = 28px */
+  /* 半格宽度 (0.25u 步进) */
+  .keyboard-key.wide-025 { width: 35px; }  /* 1.25u */
+  .keyboard-key.wide-05  { width: 42px; }  /* 1.5u  */
+  .keyboard-key.wide-075 { width: 49px; }  /* 1.75u */
+  .keyboard-key.wide-125 { width: 70px; }  /* 2.5u  */
+  .keyboard-key.wide-15  { width: 84px; }  /* 3u    */
+  .keyboard-key.wide-175 { width: 98px; }  /* 3.5u  */
+  .keyboard-key.wide-225 { width: 112px; } /* 4u    */
+  .keyboard-key.wide-25  { width: 126px; } /* 4.5u  */
+  .keyboard-key.wide-275 { width: 140px; } /* 5u    */
+  .keyboard-key.wide-325 { width: 154px; } /* 5.5u  */
+  .keyboard-key.wide-35  { width: 168px; } /* 6u    */
+  .keyboard-key.wide-375 { width: 182px; } /* 6.5u  */
+  .keyboard-key.wide-425 { width: 196px; } /* 7u    */
 
   /* 86键布局 */
   .keyboard-86 .keyboard-row {
-    gap: 3px;
+    gap: 2px;
   }
 
   .keyboard-86 .keyboard-key {
-    font-size: 9px;
-    min-height: 32px;
+    font-size: 10px;
+    min-height: 38px;
   }
 
+  /* 第一行: ` 1 2 3 4 5 6 7 8 9 0 - = BackSpace */
+  /* BackSpace: 4u = 112px */
+  .keyboard-86 .keyboard-key.wide-225 { width: 112px; }
+
+  /* 第二行: Tab q w e r t y u i o p [ ] \ */
+  /* Tab: 1.5u = 42px, \: 1.5u = 42px */
+  .keyboard-86 .keyboard-key.wide-05 { width: 42px; }
+
+  /* 第三行: Caps a s d f g h j k l ; ' Enter */
+  /* Caps: 2u = 56px, Enter: 5u = 140px */
   .keyboard-86 .keyboard-key.wide-2 { width: 56px; }
-  .keyboard-86 .keyboard-key.wide-15 { width: 84px; }
-  .keyboard-86 .keyboard-key.wide-175 { width: 98px; }
-  .keyboard-86 .keyboard-key.wide-225 { width: 126px; }
-  .keyboard-86 .keyboard-key.wide-25 { width: 140px; }
-  .keyboard-86 .keyboard-key.wide-275 { width: 154px; }
-  .keyboard-86 .keyboard-key.wide-6 { width: 168px; }
-  .keyboard-86 .keyboard-key.wide-65 { width: 182px; }
+  .keyboard-86 .keyboard-key.wide-275 { width: 140px; }
+
+  /* 第四行: Shift z x c v b n m , . / Shift */
+  /* Shift_L: 4u = 112px, Shift_R: 5.5u = 154px */
+  /* wide-225 and wide-325 already defined above */
+
+  /* 第五行: Ctrl Win Alt Space Alt Win Ctrl */
+  /* Ctrl: 1.5u = 42px, Win: 1.25u = 35px, Alt: 1.25u = 35px, Space: 6u = 168px */
+  .keyboard-86 .keyboard-key.wide-025 { width: 35px; }
 
   /* 108键布局 */
   .keyboard-108 .keyboard-row {
-    gap: 3px;
+    gap: 2px;
   }
 
   .keyboard-108 .keyboard-key {
-    font-size: 9px;
-    min-height: 32px;
+    font-size: 10px;
+    min-height: 38px;
   }
 
-  .keyboard-108 .keyboard-key.wide-125 { width: 70px; }
-  .keyboard-108 .keyboard-key.wide-15 { width: 84px; }
-  .keyboard-108 .keyboard-key.wide-175 { width: 98px; }
-  .keyboard-108 .keyboard-key.wide-2 { width: 112px; }
-  .keyboard-108 .keyboard-key.wide-225 { width: 126px; }
-  .keyboard-108 .keyboard-key.wide-25 { width: 140px; }
-  .keyboard-108 .keyboard-key.wide-275 { width: 154px; }
-  .keyboard-108 .keyboard-key.wide-3 { width: 168px; }
-  .keyboard-108 .keyboard-key.wide-65 { width: 182px; }
-  .keyboard-108 .keyboard-key.wide-7 { width: 196px; }
+  /* 第一行: ` 1 2 3 4 5 6 7 8 9 0 - = BackSpace */
+  /* BackSpace: 2u = 56px */
+  .keyboard-108 .keyboard-key.wide-2 { width: 56px; }
+
+  /* 第二行: Tab q w e r t y u i o p [ ] \ */
+  /* Tab: 2u = 56px, \: 1.5u = 42px */
+  /* wide-2 and wide-05 already defined above */
+
+  /* 第三行: Caps a s d f g h j k l ; ' Enter */
+  /* Caps: 2u = 56px, Enter: 5u = 140px */
+  /* wide-2 and wide-275 already defined above */
+
+  /* 第四行: Shift z x c v b n m , . / Shift */
+  /* Shift_L: 5u = 140px, Shift_R: 6u = 168px */
+  .keyboard-108 .keyboard-key.wide-275 { width: 140px; }
+  .keyboard-108 .keyboard-key.wide-35 { width: 168px; }
+
+  /* 第五行: Ctrl Alt Space Alt Ctrl */
+  /* Alt: 1.25u = 35px, Space: 6.25u = 175px */
+  .keyboard-108 .keyboard-key.wide-025 { width: 35px; }
+  .keyboard-108 .keyboard-key.wide-625 { width: 175px; }
 </style>
 </head>
 <body>
@@ -1345,53 +1388,53 @@ const KEYBOARD_LAYOUTS = {
   '86': {
     name: '86键',
     rows: [
-      // 第一行：数字键
+      // 第一行：数字键 (BackSpace: 4u = 112px)
       [
         { key: '`', label: '`' }, { key: '1', label: '1' }, { key: '2', label: '2' }, { key: '3', label: '3' },
         { key: '4', label: '4' }, { key: '5', label: '5' }, { key: '6', label: '6' },
         { key: '7', label: '7' }, { key: '8', label: '8' }, { key: '9', label: '9' },
-        { key: '0', label: '0' }, { key: '-', label: '-' }, { key: '=', label: '=' }, { key: 'BackSpace', label: '←', width: 'wide-175' }
+        { key: '0', label: '0' }, { key: '-', label: '-' }, { key: '=', label: '=' }, { key: 'BackSpace', label: '←', width: 'wide-225' }
       ],
-      // 第二行
+      // 第二行 (Tab: 1.5u = 42px, \: 1.5u = 42px)
       [
-        { key: 'Tab', label: 'Tab', width: 'wide-15' },
+        { key: 'Tab', label: 'Tab', width: 'wide-05' },
         { key: 'q', label: 'Q' }, { key: 'w', label: 'W' }, { key: 'e', label: 'E' }, { key: 'r', label: 'R' },
         { key: 't', label: 'T' }, { key: 'y', label: 'Y' }, { key: 'u', label: 'U' }, { key: 'i', label: 'I' },
         { key: 'o', label: 'O' }, { key: 'p', label: 'P' },
-        { key: '[', label: '[' }, { key: ']', label: ']' }, { key: '\\', label: '\\', width: 'wide-175' }
+        { key: '[', label: '[' }, { key: ']', label: ']' }, { key: '\\', label: '\\', width: 'wide-05' }
       ],
-      // 第三行
+      // 第三行 (Caps: 2u = 56px, Enter: 5u = 140px)
       [
-        { key: 'Caps_Lock', label: 'Caps', width: 'wide-175' },
+        { key: 'Caps_Lock', label: 'Caps', width: 'wide-2' },
         { key: 'a', label: 'A' }, { key: 's', label: 'S' }, { key: 'd', label: 'D' }, { key: 'f', label: 'F' },
         { key: 'g', label: 'G' }, { key: 'h', label: 'H' }, { key: 'j', label: 'J' },
         { key: 'k', label: 'K' }, { key: 'l', label: 'L' },
-        { key: ';', label: ';' }, { key: "'", label: "'" }, { key: 'Enter', label: 'Enter', width: 'wide-225' }
+        { key: ';', label: ';' }, { key: "'", label: "'" }, { key: 'Enter', label: 'Enter', width: 'wide-275' }
       ],
-      // 第四行
+      // 第四行 (Shift_L: 4u = 112px, Shift_R: 5.5u = 154px)
       [
         { key: 'Shift_L', label: 'Shift', width: 'wide-225' },
         { key: 'z', label: 'Z' }, { key: 'x', label: 'X' }, { key: 'c', label: 'C' }, { key: 'v', label: 'V' },
         { key: 'b', label: 'B' }, { key: 'n', label: 'N' }, { key: 'm', label: 'M' },
         { key: ',', label: ',' }, { key: '.', label: '.' }, { key: '/', label: '/' },
-        { key: 'Shift_R', label: 'Shift', width: 'wide-275' }
+        { key: 'Shift_R', label: 'Shift', width: 'wide-325' }
       ],
-      // 第五行
+      // 第五行 (Ctrl: 1.5u = 42px, Win/Alt: 1.25u = 35px, Space: 6u = 168px)
       [
-        { key: 'Control_L', label: 'Ctrl', width: 'wide-15' },
-        { key: 'Super_L', label: 'Win', width: 'wide-15' },
-        { key: 'Alt_L', label: 'Alt', width: 'wide-15' },
-        { key: ' ', label: '', width: 'wide-6' },
-        { key: 'Alt_R', label: 'Alt', width: 'wide-15' },
-        { key: 'Super_R', label: 'Win', width: 'wide-15' },
-        { key: 'Control_R', label: 'Ctrl', width: 'wide-15' }
+        { key: 'Control_L', label: 'Ctrl', width: 'wide-05' },
+        { key: 'Super_L', label: 'Win', width: 'wide-025' },
+        { key: 'Alt_L', label: 'Alt', width: 'wide-025' },
+        { key: ' ', label: '', width: 'wide-35' },
+        { key: 'Alt_R', label: 'Alt', width: 'wide-025' },
+        { key: 'Super_R', label: 'Win', width: 'wide-025' },
+        { key: 'Control_R', label: 'Ctrl', width: 'wide-05' }
       ]
     ]
   },
   '108': {
     name: '108键',
     rows: [
-      // 第一行
+      // 第一行 (BackSpace: 2u = 56px)
       [
         { key: '`', label: '`' }, { key: '1', label: '1' }, { key: '2', label: '2' }, { key: '3', label: '3' },
         { key: '4', label: '4' }, { key: '5', label: '5' }, { key: '6', label: '6' },
@@ -1399,38 +1442,38 @@ const KEYBOARD_LAYOUTS = {
         { key: '0', label: '0' }, { key: '-', label: '-' }, { key: '=', label: '=' },
         { key: 'BackSpace', label: '←', width: 'wide-2' }
       ],
-      // 第二行
+      // 第二行 (Tab: 2u = 56px, \: 1.5u = 42px)
       [
-        { key: 'Tab', label: 'Tab', width: 'wide-125' },
+        { key: 'Tab', label: 'Tab', width: 'wide-2' },
         { key: 'q', label: 'Q' }, { key: 'w', label: 'W' }, { key: 'e', label: 'E' }, { key: 'r', label: 'R' },
         { key: 't', label: 'T' }, { key: 'y', label: 'Y' }, { key: 'u', label: 'U' }, { key: 'i', label: 'I' },
         { key: 'o', label: 'O' }, { key: 'p', label: 'P' },
-        { key: '[', label: '[' }, { key: ']', label: ']' }, { key: '\\', label: '\\', width: 'wide-175' }
+        { key: '[', label: '[' }, { key: ']', label: ']' }, { key: '\\', label: '\\', width: 'wide-05' }
       ],
-      // 第三行
+      // 第三行 (Caps: 2u = 56px, Enter: 5u = 140px)
       [
-        { key: 'Caps_Lock', label: 'Caps', width: 'wide-175' },
+        { key: 'Caps_Lock', label: 'Caps', width: 'wide-2' },
         { key: 'a', label: 'A' }, { key: 's', label: 'S' }, { key: 'd', label: 'D' }, { key: 'f', label: 'F' },
         { key: 'g', label: 'G' }, { key: 'h', label: 'H' }, { key: 'j', label: 'J' },
         { key: 'k', label: 'K' }, { key: 'l', label: 'L' },
         { key: ';', label: ';' }, { key: "'", label: "'" },
-        { key: 'Enter', label: 'Enter', width: 'wide-25' }
+        { key: 'Enter', label: 'Enter', width: 'wide-275' }
       ],
-      // 第四行
+      // 第四行 (Shift_L: 5u = 140px, Shift_R: 6u = 168px)
       [
         { key: 'Shift_L', label: 'Shift', width: 'wide-275' },
         { key: 'z', label: 'Z' }, { key: 'x', label: 'X' }, { key: 'c', label: 'C' }, { key: 'v', label: 'V' },
         { key: 'b', label: 'B' }, { key: 'n', label: 'N' }, { key: 'm', label: 'M' },
         { key: ',', label: ',' }, { key: '.', label: '.' }, { key: '/', label: '/' },
-        { key: 'Shift_R', label: 'Shift', width: 'wide-3' }
+        { key: 'Shift_R', label: 'Shift', width: 'wide-35' }
       ],
-      // 第五行
+      // 第五行 (Alt: 1.25u = 35px, Space: 6.25u = 175px)
       [
-        { key: 'Control_L', label: 'Ctrl', width: 'wide-15' },
-        { key: 'Alt_L', label: 'Alt', width: 'wide-15' },
-        { key: ' ', label: '', width: 'wide-65' },
-        { key: 'Alt_R', label: 'Alt', width: 'wide-15' },
-        { key: 'Control_R', label: 'Ctrl', width: 'wide-15' }
+        { key: 'Control_L', label: 'Ctrl', width: 'wide-05' },
+        { key: 'Alt_L', label: 'Alt', width: 'wide-025' },
+        { key: ' ', label: '', width: 'wide-625' },
+        { key: 'Alt_R', label: 'Alt', width: 'wide-025' },
+        { key: 'Control_R', label: 'Ctrl', width: 'wide-05' }
       ]
     ]
   }
@@ -1454,12 +1497,13 @@ function renderKeyboard(data) {
           <div class="keyboard-row">
             ${row.map(({ key, label, width }) => {
               const count = appData.keys[key] || 0;
-              const intensity = count > 0 ? Math.min(count / maxCount, 1) : 0;
+              // 改进强度计算: 使用平方根函数让低频差异更明显
+              const intensity = count > 0 ? Math.sqrt(count / maxCount) : 0;
               return `
                 <div class="keyboard-key ${width || ''} ${count > 0 ? 'pressed' : ''}"
                      style="${count > 0 ? `--intensity: ${intensity};` : ''}">
                   <span class="key-label">${label || key}</span>
-                  ${count > 0 ? `<span class="key-count">${count}</span>` : ''}
+                  ${count > 0 ? `<span class="key-count">${formatNum(count)}</span>` : ''}
                 </div>
               `;
             }).join('')}
