@@ -901,16 +901,6 @@
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
   }
 
-  .keyboard-key .key-count {
-    position: absolute;
-    bottom: 2px;
-    right: 4px;
-    font-size: 9px;
-    color: var(--muted);
-    z-index: 1;
-    font-weight: 500;
-  }
-
   /* 统一单位: 1u = 28px */
   /* 半格宽度 (0.25u 步进) */
   .keyboard-key.wide-025 { width: 35px; }  /* 1.25u */
@@ -1481,7 +1471,7 @@ const KEYBOARD_LAYOUTS = {
   }
 };
 
-function renderKeyboard(data) {
+  function renderKeyboard(data) {
   const keyboardEl = document.getElementById("keyboard");
   const appData = data.apps[appFilter];
   if (!appData) return;
@@ -1505,7 +1495,6 @@ function renderKeyboard(data) {
                 <div class="keyboard-key ${width || ''} ${count > 0 ? 'pressed' : ''}"
                      style="${count > 0 ? `--intensity: ${intensity};` : ''}">
                   <span class="key-label">${label || key}</span>
-                  ${count > 0 ? `<span class="key-count">${formatNum(count)}</span>` : ''}
                 </div>
               `;
             }).join('')}
