@@ -828,6 +828,125 @@
       width: 48px;
     }
   }
+
+  /* 虚拟键盘样式 */
+  .keyboard-container {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+    backdrop-filter: blur(8px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .keyboard-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 16px;
+  }
+
+  .keyboard-row {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 4px;
+    justify-content: center;
+  }
+
+  .keyboard-key {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bar-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text);
+    transition: all 0.2s;
+    cursor: default;
+    min-height: 36px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .keyboard-key::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255, 158, 100, 0.8), rgba(247, 118, 100, 0.6));
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .keyboard-key.active {
+    border-color: var(--orange);
+    box-shadow: 0 0 12px rgba(255, 158, 100, 0.4);
+  }
+
+  .keyboard-key.active::before {
+    opacity: 0.3;
+  }
+
+  .keyboard-key .key-label {
+    position: relative;
+    z-index: 1;
+  }
+
+  .keyboard-key .key-count {
+    position: absolute;
+    bottom: 2px;
+    right: 4px;
+    font-size: 8px;
+    color: var(--muted);
+    z-index: 1;
+  }
+
+  /* 86键布局 */
+  .keyboard-86 .keyboard-row {
+    gap: 3px;
+  }
+
+  .keyboard-86 .keyboard-key {
+    font-size: 9px;
+    min-height: 32px;
+  }
+
+  .keyboard-86 .keyboard-key.wide-2 { width: 56px; }
+  .keyboard-86 .keyboard-key.wide-15 { width: 84px; }
+  .keyboard-86 .keyboard-key.wide-175 { width: 98px; }
+  .keyboard-86 .keyboard-key.wide-225 { width: 126px; }
+  .keyboard-86 .keyboard-key.wide-25 { width: 140px; }
+  .keyboard-86 .keyboard-key.wide-275 { width: 154px; }
+  .keyboard-86 .keyboard-key.wide-6 { width: 168px; }
+  .keyboard-86 .keyboard-key.wide-65 { width: 182px; }
+
+  /* 108键布局 */
+  .keyboard-108 .keyboard-row {
+    gap: 3px;
+  }
+
+  .keyboard-108 .keyboard-key {
+    font-size: 9px;
+    min-height: 32px;
+  }
+
+  .keyboard-108 .keyboard-key.wide-125 { width: 70px; }
+  .keyboard-108 .keyboard-key.wide-15 { width: 84px; }
+  .keyboard-108 .keyboard-key.wide-175 { width: 98px; }
+  .keyboard-108 .keyboard-key.wide-2 { width: 112px; }
+  .keyboard-108 .keyboard-key.wide-225 { width: 126px; }
+  .keyboard-108 .keyboard-key.wide-25 { width: 140px; }
+  .keyboard-108 .keyboard-key.wide-275 { width: 154px; }
+  .keyboard-108 .keyboard-key.wide-3 { width: 168px; }
+  .keyboard-108 .keyboard-key.wide-65 { width: 182px; }
+  .keyboard-108 .keyboard-key.wide-7 { width: 196px; }
 </style>
 </head>
 <body>
@@ -855,6 +974,12 @@
     <button data-g="year">年</button>
   </div>
   <div id="chart"></div>
+  <div class="keyboard-layout" id="keyboardLayout" style="display: none;">
+    <span class="label">键盘</span>
+    <button data-layout="86" class="active">86键</button>
+    <button data-layout="108">108键</button>
+  </div>
+  <div id="keyboard"></div>
   <div id="content"></div>
 </main>
 
@@ -879,7 +1004,7 @@ const appFilter = params.get("app") || "";
 const backLink = document.getElementById("back");
 backLink.style.display = appFilter ? "inline-flex" : "none";
 
-let state = { granularity: "" };
+let state = { granularity: "", keyboardLayout: "86" };
 let lastData = null;
 let lastStats = null;  // { total, appCount, topApp, topCount }
 let lastAppsKey = "";  // 应用列表的签名，用于判断是否需要重绘
@@ -890,6 +1015,18 @@ document.querySelectorAll("#granSelect button").forEach((btn) => {
     btn.classList.add("active");
     state.granularity = btn.dataset.g;
     refresh();
+  });
+});
+
+// 键盘布局切换
+document.querySelectorAll("#keyboardLayout button").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll("#keyboardLayout button").forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+    state.keyboardLayout = btn.dataset.layout;
+    if (lastData) {
+      renderKeyboard(lastData);
+    }
   });
 });
 
@@ -993,8 +1130,14 @@ function render(data) {
   renderChart(data);
 
   if (appFilter) {
+    // 显示键盘切换按钮和键盘
+    document.getElementById("keyboardLayout").style.display = "flex";
     renderKeys(root, apps);
+    renderKeyboard(data);
   } else {
+    // 隐藏键盘
+    document.getElementById("keyboardLayout").style.display = "none";
+    document.getElementById("keyboard").innerHTML = "";
     renderApps(root, apps);
   }
 }
@@ -1307,6 +1450,138 @@ function classifyKey(k) {
   if (/^(Return|BackSpace|Delete|Escape|Enter|Space|Up|Down|Left|Right|Home|End|Page|Insert|Print|Scroll|Pause|Menu)/.test(k)) return 'key-nav';
   if (/^[A-Za-z]$/.test(k)) return 'key-alpha';
   return 'key-regular';
+}
+
+// 键盘布局定义
+const KEYBOARD_LAYOUTS = {
+  '86': {
+    name: '86键',
+    rows: [
+      // 第一行：数字键
+      [
+        { key: '`', label: '`' }, { key: '1', label: '1' }, { key: '2', label: '2' }, { key: '3', label: '3' },
+        { key: '4', label: '4' }, { key: '5', label: '5' }, { key: '6', label: '6' },
+        { key: '7', label: '7' }, { key: '8', label: '8' }, { key: '9', label: '9' },
+        { key: '0', label: '0' }, { key: '-', label: '-' }, { key: '=', label: '=' }, { key: 'BackSpace', label: '←', width: 'wide-175' }
+      ],
+      // 第二行
+      [
+        { key: 'Tab', label: 'Tab', width: 'wide-15' },
+        { key: 'q', label: 'Q' }, { key: 'w', label: 'W' }, { key: 'e', label: 'E' }, { key: 'r', label: 'R' },
+        { key: 't', label: 'T' }, { key: 'y', label: 'Y' }, { key: 'u', label: 'U' }, { key: 'i', label: 'I' },
+        { key: 'o', label: 'O' }, { key: 'p', label: 'P' },
+        { key: '[', label: '[' }, { key: ']', label: ']' }, { key: '\\', label: '\\', width: 'wide-175' }
+      ],
+      // 第三行
+      [
+        { key: 'Caps_Lock', label: 'Caps', width: 'wide-175' },
+        { key: 'a', label: 'A' }, { key: 's', label: 'S' }, { key: 'd', label: 'D' }, { key: 'f', label: 'F' },
+        { key: 'g', label: 'G' }, { key: 'h', label: 'H' }, { key: 'j', label: 'J' },
+        { key: 'k', label: 'K' }, { key: 'l', label: 'L' },
+        { key: ';', label: ';' }, { key: "'", label: "'" }, { key: 'Enter', label: 'Enter', width: 'wide-225' }
+      ],
+      // 第四行
+      [
+        { key: 'Shift_L', label: 'Shift', width: 'wide-225' },
+        { key: 'z', label: 'Z' }, { key: 'x', label: 'X' }, { key: 'c', label: 'C' }, { key: 'v', label: 'V' },
+        { key: 'b', label: 'B' }, { key: 'n', label: 'N' }, { key: 'm', label: 'M' },
+        { key: ',', label: ',' }, { key: '.', label: '.' }, { key: '/', label: '/' },
+        { key: 'Shift_R', label: 'Shift', width: 'wide-275' }
+      ],
+      // 第五行
+      [
+        { key: 'Control_L', label: 'Ctrl', width: 'wide-15' },
+        { key: 'Super_L', label: 'Win', width: 'wide-15' },
+        { key: 'Alt_L', label: 'Alt', width: 'wide-15' },
+        { key: ' ', label: '', width: 'wide-6' },
+        { key: 'Alt_R', label: 'Alt', width: 'wide-15' },
+        { key: 'Super_R', label: 'Win', width: 'wide-15' },
+        { key: 'Control_R', label: 'Ctrl', width: 'wide-15' }
+      ]
+    ]
+  },
+  '108': {
+    name: '108键',
+    rows: [
+      // 第一行
+      [
+        { key: '`', label: '`' }, { key: '1', label: '1' }, { key: '2', label: '2' }, { key: '3', label: '3' },
+        { key: '4', label: '4' }, { key: '5', label: '5' }, { key: '6', label: '6' },
+        { key: '7', label: '7' }, { key: '8', label: '8' }, { key: '9', label: '9' },
+        { key: '0', label: '0' }, { key: '-', label: '-' }, { key: '=', label: '=' },
+        { key: 'BackSpace', label: '←', width: 'wide-2' }
+      ],
+      // 第二行
+      [
+        { key: 'Tab', label: 'Tab', width: 'wide-125' },
+        { key: 'q', label: 'Q' }, { key: 'w', label: 'W' }, { key: 'e', label: 'E' }, { key: 'r', label: 'R' },
+        { key: 't', label: 'T' }, { key: 'y', label: 'Y' }, { key: 'u', label: 'U' }, { key: 'i', label: 'I' },
+        { key: 'o', label: 'O' }, { key: 'p', label: 'P' },
+        { key: '[', label: '[' }, { key: ']', label: ']' }, { key: '\\', label: '\\', width: 'wide-175' }
+      ],
+      // 第三行
+      [
+        { key: 'Caps_Lock', label: 'Caps', width: 'wide-175' },
+        { key: 'a', label: 'A' }, { key: 's', label: 'S' }, { key: 'd', label: 'D' }, { key: 'f', label: 'F' },
+        { key: 'g', label: 'G' }, { key: 'h', label: 'H' }, { key: 'j', label: 'J' },
+        { key: 'k', label: 'K' }, { key: 'l', label: 'L' },
+        { key: ';', label: ';' }, { key: "'", label: "'" },
+        { key: 'Enter', label: 'Enter', width: 'wide-25' }
+      ],
+      // 第四行
+      [
+        { key: 'Shift_L', label: 'Shift', width: 'wide-275' },
+        { key: 'z', label: 'Z' }, { key: 'x', label: 'X' }, { key: 'c', label: 'C' }, { key: 'v', label: 'V' },
+        { key: 'b', label: 'B' }, { key: 'n', label: 'N' }, { key: 'm', label: 'M' },
+        { key: ',', label: ',' }, { key: '.', label: '.' }, { key: '/', label: '/' },
+        { key: 'Shift_R', label: 'Shift', width: 'wide-3' }
+      ],
+      // 第五行
+      [
+        { key: 'Control_L', label: 'Ctrl', width: 'wide-15' },
+        { key: 'Alt_L', label: 'Alt', width: 'wide-15' },
+        { key: ' ', label: '', width: 'wide-65' },
+        { key: 'Alt_R', label: 'Alt', width: 'wide-15' },
+        { key: 'Control_R', label: 'Ctrl', width: 'wide-15' }
+      ]
+    ]
+  }
+};
+
+function renderKeyboard(data) {
+  const keyboardEl = document.getElementById("keyboard");
+  const appData = data.apps[appFilter];
+  if (!appData) return;
+
+  const layout = KEYBOARD_LAYOUTS[state.keyboardLayout];
+  if (!layout) return;
+
+  const maxCount = Math.max(...Object.values(appData.keys), 1);
+
+  const keyboardHtml = `
+    <div class="keyboard-container fade-in">
+      <div class="keyboard-title">键盘热力图 (${layout.name})</div>
+      <div class="keyboard-${state.keyboardLayout}">
+        ${layout.rows.map((row, rowIdx) => `
+          <div class="keyboard-row">
+            ${row.map(({ key, label, width }) => {
+              const count = appData.keys[key] || 0;
+              const intensity = count > 0 ? Math.min(count / maxCount, 1) : 0;
+              return `
+                <div class="keyboard-key ${width || ''} ${count > 0 ? 'active' : ''}"
+                     style="${count > 0 ? `opacity: ${0.3 + intensity * 0.7};` : 'opacity: 0.3;'}">
+                  <span class="key-label">${label || key}</span>
+                  ${count > 0 ? `<span class="key-count">${count}</span>` : ''}
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+
+  keyboardEl.innerHTML = keyboardHtml;
 }
 
 refresh();
