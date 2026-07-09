@@ -334,8 +334,8 @@
   }
   .app-table .table-header .col-rank { width: 28px; }
   .app-table .table-header .col-name { flex: 1; }
-  .app-table .table-header .col-keys { width: 72px; text-align: right; }
-  .app-table .table-header .col-bar { width: 72px; text-align: right; }
+  .app-table .table-header .col-keys { width: 80px; text-align: right; }
+  .app-table .table-header .col-bar { width: 100px; text-align: right; }
 
   .app-row {
     display: flex; align-items: center;
@@ -1182,7 +1182,7 @@ function renderApps(root, apps) {
   </div>`;
 }
 
-function classifyKey(k) {
+function renderKeys(root, apps) {
   const appData = apps[0];
   if (!appData) {
     root.innerHTML = '<div class="empty">该应用暂无数据</div>';
@@ -1201,7 +1201,7 @@ function classifyKey(k) {
   // 计算字母使用频率分布（A-Z）
   const alphaFreq = {};
   for (let i = 0; i < 26; i++) {
-    alphaFreq[String.fromCharCode(65 + i)] = 0; // A-Z
+    alphaFreq[String.fromCharCode(65 + i)] = 0;
   }
   alphaKeys.forEach(([k, v]) => {
     const upper = k.toUpperCase();
@@ -1300,13 +1300,13 @@ function classifyKey(k) {
       </div>`;
     }).join("")}
   </div>`;
+}
 
-  // 调试：检查渲染结果
-
-  // 验证 bar-fill 是否被正确渲染
-  const barFills = root.querySelectorAll('.bar-fill');
-  if (barFills.length > 0) {
-  }
+function classifyKey(k) {
+  if (/^(Shift|Ctrl|Alt|Super|Meta|Control|Caps|Tab)/.test(k)) return 'key-mod';
+  if (/^(Return|BackSpace|Delete|Escape|Enter|Space|Up|Down|Left|Right|Home|End|Page|Insert|Print|Scroll|Pause|Menu)/.test(k)) return 'key-nav';
+  if (/^[A-Za-z]$/.test(k)) return 'key-alpha';
+  return 'key-regular';
 }
 
 refresh();
