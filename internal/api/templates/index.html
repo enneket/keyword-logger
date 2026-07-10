@@ -924,12 +924,18 @@
   .keyboard-87 .keyboard-row {
     gap: 2px;
     margin-bottom: 2px;
+    justify-content: flex-start;
   }
 
   .keyboard-87 .keyboard-key {
     font-size: 9px;
     min-height: 32px;
     padding: 0 2px;
+  }
+  .keyboard-87 .keyboard-key.__gap__ {
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
   }
 
   /* Row 1: Esc(1.5u) + F1-F12(各1u) */
@@ -966,12 +972,18 @@
   .keyboard-108 .keyboard-row {
     gap: 2px;
     margin-bottom: 2px;
+    justify-content: flex-start;
   }
 
   .keyboard-108 .keyboard-key {
     font-size: 9px;
     min-height: 32px;
     padding: 0 2px;
+  }
+  .keyboard-108 .keyboard-key.__gap__ {
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
   }
 
   /* Row 1: 功能键 */
@@ -1410,32 +1422,40 @@ const KEYBOARD_LAYOUTS = {
   '87': {
     name: '87键',
     rows: [
-      // Row 1: 功能键 (Esc + F1-F12 = 13键)
-      // Esc: 1.5u = 42px, Fn: 1.25u = 35px
+      // Row 1: Esc | F1-4 | F5-8 | F9-12 | PrtSc/Scroll/Pause
       [
         { key: 'Escape', label: 'Esc', width: 'w15' },
-        { key: 'F1', label: 'F1' }, { key: 'F2', label: 'F2' }, { key: 'F3', label: 'F3' },
-        { key: 'F4', label: 'F4' }, { key: 'F5', label: 'F5' }, { key: 'F6', label: 'F6' },
-        { key: 'F7', label: 'F7' }, { key: 'F8', label: 'F8' }, { key: 'F9', label: 'F9' },
-        { key: 'F10', label: 'F10' }, { key: 'F11', label: 'F11' }, { key: 'F12', label: 'F12' }
+        { key: '__gap__', label: '', width: 'w05' },
+        { key: 'F1', label: 'F1' }, { key: 'F2', label: 'F2' }, { key: 'F3', label: 'F3' }, { key: 'F4', label: 'F4' },
+        { key: '__gap__', label: '', width: 'w05' },
+        { key: 'F5', label: 'F5' }, { key: 'F6', label: 'F6' }, { key: 'F7', label: 'F7' }, { key: 'F8', label: 'F8' },
+        { key: '__gap__', label: '', width: 'w05' },
+        { key: 'F9', label: 'F9' }, { key: 'F10', label: 'F10' }, { key: 'F11', label: 'F11' }, { key: 'F12', label: 'F12' },
+        { key: 'Print', label: 'PrtSc' }, { key: 'ScrollLock', label: 'Scroll' }, { key: 'Pause', label: 'Pause' }
       ],
-      // Row 2: 数字行 (BackSpace: 4u = 112px)
+      // Row 2: 数字行 | Ins/Home/PgUp
       [
         { key: '`', label: '`' }, { key: '1', label: '1' }, { key: '2', label: '2' }, { key: '3', label: '3' },
         { key: '4', label: '4' }, { key: '5', label: '5' }, { key: '6', label: '6' },
         { key: '7', label: '7' }, { key: '8', label: '8' }, { key: '9', label: '9' },
         { key: '0', label: '0' }, { key: '-', label: '-' }, { key: '=', label: '=' },
-        { key: 'BackSpace', label: '←', width: 'w2' }
+        { key: 'BackSpace', label: '←', width: 'w2' },
+        { key: 'Insert', label: 'Ins', width: 'w15' },
+        { key: 'Home', label: 'Home', width: 'w15' },
+        { key: 'PageUp', label: 'PgUp', width: 'w15' }
       ],
-      // Row 3: QWERTY (Tab: 1.5u, \: 1.5u)
+      // Row 3: QWERTY | Del/End/PgDn
       [
         { key: 'Tab', label: 'Tab', width: 'w15' },
         { key: 'q', label: 'Q' }, { key: 'w', label: 'W' }, { key: 'e', label: 'E' }, { key: 'r', label: 'R' },
         { key: 't', label: 'T' }, { key: 'y', label: 'Y' }, { key: 'u', label: 'U' }, { key: 'i', label: 'I' },
         { key: 'o', label: 'O' }, { key: 'p', label: 'P' },
-        { key: '[', label: '[' }, { key: ']', label: ']' }, { key: '\\', label: '\\', width: 'w15' }
+        { key: '[', label: '[' }, { key: ']', label: ']' }, { key: '\\', label: '\\', width: 'w15' },
+        { key: 'Delete', label: 'Del', width: 'w15' },
+        { key: 'End', label: 'End', width: 'w15' },
+        { key: 'PageDown', label: 'PgDn', width: 'w15' }
       ],
-      // Row 4: ASDF (Caps: 2u = 56px, Enter: 5u = 140px)
+      // Row 4: ASDF
       [
         { key: 'Caps_Lock', label: 'Caps', width: 'w175' },
         { key: 'a', label: 'A' }, { key: 's', label: 'S' }, { key: 'd', label: 'D' }, { key: 'f', label: 'F' },
@@ -1443,7 +1463,7 @@ const KEYBOARD_LAYOUTS = {
         { key: 'k', label: 'K' }, { key: 'l', label: 'L' },
         { key: ';', label: ';' }, { key: "'", label: "'" }, { key: 'Enter', label: 'Enter', width: 'w225' }
       ],
-      // Row 5: ZXCV (Shift_L: 4u = 112px, Shift_R: 5.5u = 154px)
+      // Row 5: ZXCV
       [
         { key: 'Shift_L', label: 'Shift', width: 'w225' },
         { key: 'z', label: 'Z' }, { key: 'x', label: 'X' }, { key: 'c', label: 'C' }, { key: 'v', label: 'V' },
@@ -1451,7 +1471,7 @@ const KEYBOARD_LAYOUTS = {
         { key: ',', label: ',' }, { key: '.', label: '.' }, { key: '/', label: '/' },
         { key: 'Shift_R', label: 'Shift', width: 'w275' }
       ],
-      // Row 6: 空格键 (Ctrl: 1.5u = 42px, Win/Alt: 1.25u = 35px, Space: 6u = 168px, Fn: 1.25u = 35px)
+      // Row 6: 空格键
       [
         { key: 'Control_L', label: 'Ctrl', width: 'w15' },
         { key: 'Super_L', label: 'Win', width: 'w125' },
@@ -1459,23 +1479,14 @@ const KEYBOARD_LAYOUTS = {
         { key: ' ', label: '', width: 'w625' },
         { key: 'Alt_R', label: 'Alt', width: 'w125' },
         { key: 'Super_R', label: 'Win', width: 'w125' },
-        { key: 'Control_R', label: 'Ctrl', width: 'w15' },
-        { key: 'Fn', label: 'Fn', width: 'w125' }
+        { key: 'Menu', label: 'Menu', width: 'w125' },
+        { key: 'Control_R', label: 'Ctrl', width: 'w15' }
       ],
-      // Row 7: 编辑键区上排 (Insert + Home + PageUp) - 每键 1.5u = 42px
+      // Row 7: ↑ (centered above arrow cluster)
       [
-        { key: 'Insert', label: 'Ins', width: 'w15' },
-        { key: 'Home', label: 'Home', width: 'w15' },
-        { key: 'PageUp', label: 'PgUp', width: 'w15' }
-      ],
-      // Row 8: 编辑键区下排 (Delete + End + PageDown + ↑) - 每键 1.5u = 42px
-      [
-        { key: 'Delete', label: 'Del', width: 'w15' },
-        { key: 'End', label: 'End', width: 'w15' },
-        { key: 'PageDown', label: 'PgDn', width: 'w15' },
         { key: 'Up', label: '↑', width: 'w15' }
       ],
-      // Row 9: 方向键区 (← + ↓ + →) - 每键 1.5u = 42px
+      // Row 8: ← ↓ → (right-aligned, inverted-T)
       [
         { key: 'Left', label: '←', width: 'w15' },
         { key: 'Down', label: '↓', width: 'w15' },
@@ -1548,6 +1559,9 @@ const KEYBOARD_LAYOUTS = {
         ${layout.rows.map((row, rowIdx) => `
           <div class="keyboard-row">
             ${row.map(({ key, label, width }) => {
+              if (key === '__gap__') {
+                return `<div class="keyboard-key ${width || ''}" style="visibility:hidden"><span class="key-label">${label || key}</span></div>`;
+              }
               const count = appData.keys[key] || 0;
               // 改进强度计算: 使用平方根函数让低频差异更明显
               const intensity = count > 0 ? Math.sqrt(count / maxCount) : 0;
