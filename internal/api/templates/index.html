@@ -986,6 +986,20 @@
     box-shadow: none;
   }
 
+  /* 主键盘区 + 导航区 布局 */
+  .keyboard-108 .keyboard-main {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    gap: 4px;
+  }
+  .keyboard-108 .keyboard-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex-shrink: 0;
+  }
+
   /* Row 1: 功能键 */
   .keyboard-108 .keyboard-row:nth-child(1) .keyboard-key.w15 { width: 42px; }
 
@@ -1482,11 +1496,11 @@ const KEYBOARD_LAYOUTS = {
         { key: 'Menu', label: 'Menu', width: 'w125' },
         { key: 'Control_R', label: 'Ctrl', width: 'w15' }
       ],
-      // Row 7: ↑ (centered above arrow cluster)
+      // Row 7: ↑ (above arrow cluster)
       [
         { key: 'Up', label: '↑', width: 'w15' }
       ],
-      // Row 8: ← ↓ → (right-aligned, inverted-T)
+      // Row 8: ← ↓ → (inverted-T, right-aligned)
       [
         { key: 'Left', label: '←', width: 'w15' },
         { key: 'Down', label: '↓', width: 'w15' },
@@ -1556,24 +1570,41 @@ const KEYBOARD_LAYOUTS = {
     <div class="keyboard-container fade-in">
       <div class="keyboard-title">键盘热力图 (${layout.name})</div>
       <div class="keyboard-${state.keyboardLayout}">
-        ${layout.rows.map((row, rowIdx) => `
-          <div class="keyboard-row">
-            ${row.map(({ key, label, width }) => {
-              if (key === '__gap__') {
-                return `<div class="keyboard-key ${width || ''}" style="visibility:hidden"><span class="key-label">${label || key}</span></div>`;
-              }
-              const count = appData.keys[key] || 0;
-              // 改进强度计算: 使用平方根函数让低频差异更明显
-              const intensity = count > 0 ? Math.sqrt(count / maxCount) : 0;
-              return `
-                <div class="keyboard-key ${width || ''} ${count > 0 ? 'pressed' : ''}"
-                     style="${count > 0 ? `--intensity: ${intensity};` : ''}">
-                  <span class="key-label">${label || key}</span>
-                </div>
-              `;
-            }).join('')}
-          </div>
-        `).join('')}
+        <div class="keyboard-main">
+          ${layout.rows.slice(0, 6).map((row, rowIdx) => `
+            <div class="keyboard-row">
+              ${row.map(({ key, label, width }) => {
+                if (key === '__gap__') {
+                  return `<div class="keyboard-key ${width || ''}" style="visibility:hidden"><span class="key-label">${label || key}</span></div>`;
+                }
+                const count = appData.keys[key] || 0;
+                const intensity = count > 0 ? Math.sqrt(count / maxCount) : 0;
+                return `
+                  <div class="keyboard-key ${width || ''} ${count > 0 ? 'pressed' : ''}"
+                       style="${count > 0 ? `--intensity: ${intensity};` : ''}">
+                    <span class="key-label">${label || key}</span>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          `).join('')}
+        </div>
+        <div class="keyboard-nav">
+          ${layout.navRows.map((row, rowIdx) => `
+            <div class="keyboard-row">
+              ${row.map(({ key, label, width }) => {
+                const count = appData.keys[key] || 0;
+                const intensity = count > 0 ? Math.sqrt(count / maxCount) : 0;
+                return `
+                  <div class="keyboard-key ${width || ''} ${count > 0 ? 'pressed' : ''}"
+                       style="${count > 0 ? `--intensity: ${intensity};` : ''}">
+                    <span class="key-label">${label || key}</span>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          `).join('')}
+        </div>
       </div>
     </div>
   `;
