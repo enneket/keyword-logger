@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>108 键全尺寸键盘布局（1:1 复刻）</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: #1e1f24;
+    width: 1666px;
+    height: 584px;
+    overflow: hidden;
+  }
+  body {
+    font-family: "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+    color: #e6e6e6;
+  }
+
+  /*
+    1:1 像素定位。108 键全尺寸布局（含数字小键盘）。
+    画布尺寸: 1666 x 584（纵向高度与 87 键版保持一致）
+    - 1u = 72 px
+    - 主体键盘区与 87 键版保持相同坐标（0..1156）
+    - 数字小键盘区位于主键盘右侧 (1382..1676)
+    - 6 行: F(71) / 数字(72) / Tab(72) / Caps(72) / Shift(72) / Ctrl(71)
+  */
+
+  .keyboard {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 1666px;
+    height: 584px;
+    background: #e8e8e8;
+    user-select: none;
+  }
+
+  .key {
+    position: absolute;
+    background: linear-gradient(180deg, #fafafa 0%, #d8d8d8 100%);
+    border: 1px solid #6a6c72;
+    border-radius: 4px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    font-size: 12px;
+    color: #2a2c30;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.85),
+      inset 0 -1px 0 rgba(0,0,0,0.08),
+      0 2px 0 #b8babf,
+      0 3px 2px rgba(0,0,0,0.20);
+    cursor: pointer;
+    text-align: center;
+    line-height: 1.1;
+    padding: 0 4px 5px 4px;
+    transition: transform 0.08s, background 0.15s, box-shadow 0.08s;
+    font-weight: 400;
+  }
+  .key:hover  {
+    background: linear-gradient(180deg, #ffffff 0%, #e6e6e6 100%);
+  }
+  .key.active {
+    transform: translateY(2px);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.85),
+      inset 0 -1px 0 rgba(0,0,0,0.08),
+      0 0 0 #b8babf,
+      0 1px 1px rgba(0,0,0,0.15);
+    background: linear-gradient(180deg, #4a90e2 0%, #357abd 100%);
+    color: #fff;
+  }
+  .key.fn-key { font-size: 13px; }
+  .key.fn-combo { font-size: 11px; line-height: 1.15; }
+
+  /* 子字符（shift 字符）显示在键左上 */
+  .key .sub  { position: absolute; top: 4px; left: 6px;  font-size: 10px; color: #5a5c63; font-weight: 400; }
+  .key.has-sub { padding-left: 13px; padding-bottom: 5px; }
+
+  /* 顶栏切换条 */
+  .topbar {
+    position: fixed;
+    top: 8px;
+    left: 8px;
+    z-index: 100;
+    display: flex;
+    gap: 4px;
+    background: rgba(0,0,0,0.55);
+    padding: 4px;
+    border-radius: 6px;
+  }
+  .topbar a {
+    color: #cfd2d8;
+    text-decoration: none;
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 4px;
+  }
+  .topbar a:hover { background: rgba(255,255,255,0.08); }
+  .topbar a.active { background: #4a90e2; color: #fff; }
+</style>
+</head>
+<body>
+  <h1 style="display:none">108 键全尺寸键盘布局（1:1 像素复刻）</h1>
+
+  <nav class="topbar">
+    <a href="keyboard.html">87 键 TKL</a>
+    <a href="keyboard108.html" class="active">108 键 全尺寸</a>
+  </nav>
+
+  <div class="keyboard" id="kb">
+
+    <!--
+      ============================================================
+      行 1: Esc + F1..F4 + gap + F5..F8 + gap + F9..F12 + gap + PrtSc + ScrLk + Pause
+      y=47..117, h=71
+      1u=72, 1u+3px=75
+      ============================================================
+    -->
+    <div class="key"         style="left:46px;   top:47px;  width:72px;  height:71px" data-k="Esc">Esc</div>
+    <div class="key fn-key"  style="left:120px;  top:47px;  width:72px;  height:71px" data-k="F1">F1</div>
+    <div class="key fn-key"  style="left:194px;  top:47px;  width:72px;  height:71px" data-k="F2">F2</div>
+    <div class="key fn-key"  style="left:268px;  top:47px;  width:72px;  height:71px" data-k="F3">F3</div>
+    <div class="key fn-key"  style="left:342px;  top:47px;  width:72px;  height:71px" data-k="F4">F4</div>
+    <div class="key fn-key"  style="left:490px;  top:47px;  width:72px;  height:71px" data-k="F5">F5</div>
+    <div class="key fn-key"  style="left:564px;  top:47px;  width:72px;  height:71px" data-k="F6">F6</div>
+    <div class="key fn-key"  style="left:638px;  top:47px;  width:72px;  height:71px" data-k="F7">F7</div>
+    <div class="key fn-key"  style="left:712px;  top:47px;  width:72px;  height:71px" data-k="F8">F8</div>
+    <div class="key fn-key"  style="left:860px;  top:47px;  width:72px;  height:71px" data-k="F9">F9</div>
+    <div class="key fn-key"  style="left:934px;  top:47px;  width:72px;  height:71px" data-k="F10">F10</div>
+    <div class="key fn-key"  style="left:1008px; top:47px;  width:72px;  height:71px" data-k="F11">F11</div>
+    <div class="key fn-key"  style="left:1082px; top:47px;  width:72px;  height:71px" data-k="F12">F12</div>
+    <div class="key fn-combo" style="left:1158px; top:47px;  width:72px;  height:71px" data-k="PrtSc">PrtSc</div>
+    <div class="key fn-combo" style="left:1232px; top:47px;  width:72px;  height:71px" data-k="ScrLk">Scroll<br>Lock</div>
+    <div class="key fn-combo" style="left:1306px; top:47px;  width:72px;  height:71px" data-k="Pause">Pause<br>Break</div>
+
+
+    <!--
+      ============================================================
+      行 2: ` 1 2 3 4 5 6 7 8 9 0 - = Backspace + Ins Home PgUp
+      y=121..228, h=108
+      ============================================================
+    -->
+    <div class="key has-sub" style="left:46px;   top:121px; width:72px;  height:72px" data-k="`"><span class="sub">~</span>`</div>
+    <div class="key has-sub" style="left:120px;  top:121px; width:72px;  height:72px" data-k="1"><span class="sub">!</span>1</div>
+    <div class="key has-sub" style="left:194px;  top:121px; width:72px;  height:72px" data-k="2"><span class="sub">@</span>2</div>
+    <div class="key has-sub" style="left:268px;  top:121px; width:72px;  height:72px" data-k="3"><span class="sub">#</span>3</div>
+    <div class="key has-sub" style="left:342px;  top:121px; width:72px;  height:72px" data-k="4"><span class="sub">$</span>4</div>
+    <div class="key has-sub" style="left:416px;  top:121px; width:72px;  height:72px" data-k="5"><span class="sub">%</span>5</div>
+    <div class="key has-sub" style="left:490px;  top:121px; width:72px;  height:72px" data-k="6"><span class="sub">^</span>6</div>
+    <div class="key has-sub" style="left:564px;  top:121px; width:72px;  height:72px" data-k="7"><span class="sub">&amp;</span>7</div>
+    <div class="key has-sub" style="left:638px;  top:121px; width:72px;  height:72px" data-k="8"><span class="sub">*</span>8</div>
+    <div class="key has-sub" style="left:712px;  top:121px; width:72px;  height:72px" data-k="9"><span class="sub">(</span>9</div>
+    <div class="key has-sub" style="left:786px;  top:121px; width:72px;  height:72px" data-k="0"><span class="sub">)</span>0</div>
+    <div class="key has-sub" style="left:860px;  top:121px; width:72px;  height:72px" data-k="-"><span class="sub">_</span>-</div>
+    <div class="key has-sub" style="left:934px;  top:121px; width:72px;  height:72px" data-k="="><span class="sub">+</span>=</div>
+    <div class="key"         style="left:1008px; top:121px; width:146px; height:72px" data-k="Backspace">Backspace</div>
+    <div class="key fn-combo" style="left:1158px; top:121px; width:72px;  height:72px" data-k="Ins">Insert</div>
+    <div class="key fn-combo" style="left:1232px; top:121px; width:72px;  height:72px" data-k="Home">Home</div>
+    <div class="key fn-combo" style="left:1306px; top:121px; width:72px;  height:72px" data-k="PgUp">PgUp</div>
+
+
+    <!--
+      ============================================================
+      行 3: Tab Q W E R T Y U I O P [ ] \ + Del End PgDn
+      y=233..304, h=72
+      Tab=1u, \=2u
+      ============================================================
+    -->
+    <div class="key"         style="left:46px;   top:196px; width:72px;  height:72px" data-k="Tab">Tab</div>
+    <div class="key"         style="left:120px;  top:196px; width:72px;  height:72px" data-k="Q">Q</div>
+    <div class="key"         style="left:194px;  top:196px; width:72px;  height:72px" data-k="W">W</div>
+    <div class="key"         style="left:268px;  top:196px; width:72px;  height:72px" data-k="E">E</div>
+    <div class="key"         style="left:342px;  top:196px; width:72px;  height:72px" data-k="R">R</div>
+    <div class="key"         style="left:416px;  top:196px; width:72px;  height:72px" data-k="T">T</div>
+    <div class="key"         style="left:490px;  top:196px; width:72px;  height:72px" data-k="Y">Y</div>
+    <div class="key"         style="left:564px;  top:196px; width:72px;  height:72px" data-k="U">U</div>
+    <div class="key"         style="left:638px;  top:196px; width:72px;  height:72px" data-k="I">I</div>
+    <div class="key"         style="left:712px;  top:196px; width:72px;  height:72px" data-k="O">O</div>
+    <div class="key"         style="left:786px;  top:196px; width:72px;  height:72px" data-k="P">P</div>
+    <div class="key has-sub" style="left:860px;  top:196px; width:72px;  height:72px" data-k="["><span class="sub">{</span>[</div>
+    <div class="key has-sub" style="left:934px;  top:196px; width:72px;  height:72px" data-k="]"><span class="sub">}</span>]</div>
+    <div class="key"         style="left:1008px; top:196px; width:146px; height:72px" data-k="\">\</div>
+    <div class="key fn-combo" style="left:1158px; top:196px; width:72px;  height:72px" data-k="Del">Delete</div>
+    <div class="key fn-combo" style="left:1232px; top:196px; width:72px;  height:72px" data-k="End">End</div>
+    <div class="key fn-combo" style="left:1306px; top:196px; width:72px;  height:72px" data-k="PgDn">PgDn</div>
+
+
+    <!--
+      ============================================================
+      行 4: Caps A S D F G H J K L ; ' Enter
+      y=307..378, h=72
+      Caps=1.5u (108), Enter=2.55u (183)  实测: Caps 46..154 (108), Enter 973..1156 (183)
+      ============================================================
+    -->
+    <div class="key has-sub" style="left:46px;   top:271px; width:108px; height:72px" data-k="Caps"><span class="sub">⇪</span>Caps Lock</div>
+    <div class="key"         style="left:157px;  top:271px; width:72px;  height:72px" data-k="A">A</div>
+    <div class="key"         style="left:231px;  top:271px; width:72px;  height:72px" data-k="S">S</div>
+    <div class="key"         style="left:305px;  top:271px; width:72px;  height:72px" data-k="D">D</div>
+    <div class="key"         style="left:379px;  top:271px; width:72px;  height:72px" data-k="F">F</div>
+    <div class="key"         style="left:453px;  top:271px; width:72px;  height:72px" data-k="G">G</div>
+    <div class="key"         style="left:527px;  top:271px; width:72px;  height:72px" data-k="H">H</div>
+    <div class="key"         style="left:601px;  top:271px; width:72px;  height:72px" data-k="J">J</div>
+    <div class="key"         style="left:675px;  top:271px; width:72px;  height:72px" data-k="K">K</div>
+    <div class="key"         style="left:749px;  top:271px; width:72px;  height:72px" data-k="L">L</div>
+    <div class="key has-sub" style="left:823px;  top:271px; width:72px;  height:72px" data-k=";"><span class="sub">:</span>;</div>
+    <div class="key has-sub" style="left:897px;  top:271px; width:72px;  height:72px" data-k="'"><span class="sub">&quot;</span>'</div>
+    <div class="key has-sub" style="left:971px;  top:271px; width:185px; height:72px" data-k="Enter"><span class="sub">↵</span>Enter</div>
+
+
+    <!--
+      ============================================================
+      行 5: LShift Z X C V B N M , . / RShift ↑
+      y=381..452, h=72
+      实测: LShift 46..210 (164), RShift 954..1155 (201), ↑ 1158..1250 (92)
+      ============================================================
+    -->
+    <div class="key has-sub" style="left:46px;   top:346px; width:164px; height:72px" data-k="LShift"><span class="sub">⇧</span>Shift</div>
+    <div class="key"         style="left:212px;  top:346px; width:72px;  height:72px" data-k="Z">Z</div>
+    <div class="key"         style="left:286px;  top:346px; width:72px;  height:72px" data-k="X">X</div>
+    <div class="key"         style="left:360px;  top:346px; width:72px;  height:72px" data-k="C">C</div>
+    <div class="key"         style="left:434px;  top:346px; width:72px;  height:72px" data-k="V">V</div>
+    <div class="key"         style="left:508px;  top:346px; width:72px;  height:72px" data-k="B">B</div>
+    <div class="key"         style="left:582px;  top:346px; width:72px;  height:72px" data-k="N">N</div>
+    <div class="key"         style="left:656px;  top:346px; width:72px;  height:72px" data-k="M">M</div>
+    <div class="key has-sub" style="left:730px;  top:346px; width:72px;  height:72px" data-k=","><span class="sub">&lt;</span>,</div>
+    <div class="key has-sub" style="left:804px;  top:346px; width:72px;  height:72px" data-k="."><span class="sub">&gt;</span>.</div>
+    <div class="key has-sub" style="left:878px;  top:346px; width:72px;  height:72px" data-k="/"><span class="sub">?</span>/</div>
+    <div class="key has-sub" style="left:952px;  top:346px; width:203px; height:72px" data-k="RShift"><span class="sub">⇧</span>Shift</div>
+    <div class="key fn-key"  style="left:1232px; top:346px; width:72px;  height:72px" data-k="↑">↑</div>
+
+
+    <!--
+      ============================================================
+      行 6: LCtrl Win Alt Space Alt Win Menu Ctrl ← ↓ →
+      y=456..526, h=71
+      实测: LCtrl 46..136 (90), LWin 139..227 (88), LAlt 231..321 (90)
+            Space 324..784 (460), RAlt 788..878 (90), RWin 881..969 (88)
+            Menu 973..1063 (90), RCtrl 1067..1155 (88)
+            ← 1158..1230 (72), ↓ 1232..1304 (72), → 1326..1398 (72)
+      ============================================================
+    -->
+    <div class="key"         style="left:46px;   top:421px; width:90px;  height:71px" data-k="LCtrl">Ctrl</div>
+    <div class="key"         style="left:139px;  top:421px; width:88px;  height:71px" data-k="LWin">Win</div>
+    <div class="key"         style="left:231px;  top:421px; width:90px;  height:71px" data-k="LAlt">Alt</div>
+    <div class="key"         style="left:324px;  top:421px; width:460px; height:71px" data-k="Space">&nbsp;</div>
+    <div class="key"         style="left:788px;  top:421px; width:90px;  height:71px" data-k="RAlt">Alt</div>
+    <div class="key"         style="left:881px;  top:421px; width:88px;  height:71px" data-k="RWin">Win</div>
+    <div class="key"         style="left:973px;  top:421px; width:90px;  height:71px" data-k="Fn">Fn</div>
+    <div class="key"         style="left:1067px; top:421px; width:88px;  height:71px" data-k="RCtrl">Ctrl</div>
+    <div class="key fn-key"  style="left:1158px; top:421px; width:72px;  height:71px" data-k="←">←</div>
+    <div class="key fn-key"  style="left:1232px; top:421px; width:72px;  height:71px" data-k="↓">↓</div>
+    <div class="key fn-key"  style="left:1306px; top:421px; width:72px;  height:71px" data-k="→">→</div>
+
+
+    <!--
+      ============================================================
+      数字小键盘区 (Numpad) — 位于主键盘右侧
+      区段起始 x = 1382, 结束 x = 1676
+      与主键盘之间留有约 4 px 间隙 (主键盘最右 → 1378..1382 间隙)
+      4 列 x 5 行，1u = 72 px
+      + 与 Enter 各占两行高
+      ============================================================
+
+      Numpad 行 1 (y=121, h=72) — 与主键盘数字行同 y:
+        NumLock / / * −
+      Numpad 行 2 (y=196, h=72):
+        7 / 8 / 9 / + (双行高 196..342)
+      Numpad 行 3 (y=271, h=72):
+        4 / 5 / 6
+      Numpad 行 4 (y=346, h=72):
+        1 / 2 / 3 / Enter (双行高 346..492)
+      Numpad 行 5 (y=421, h=71) — 与主键盘 Ctrl 行同 y:
+        0(2u 1382..1528) / .
+    -->
+
+    <!-- Numpad 行 1 -->
+    <div class="key"         style="left:1382px; top:121px; width:72px; height:72px" data-k="NumLock">Num<br>Lock</div>
+    <div class="key"         style="left:1456px; top:121px; width:72px; height:72px" data-k="Num/">/</div>
+    <div class="key"         style="left:1530px; top:121px; width:72px; height:72px" data-k="Num*">*</div>
+    <div class="key"         style="left:1604px; top:121px; width:72px; height:72px" data-k="Num-">−</div>
+
+    <!-- Numpad +: 双行高 y=196..342, h=146 -->
+    <div class="key"         style="left:1604px; top:196px; width:72px; height:146px" data-k="Num+">+</div>
+
+    <!-- Numpad 行 2 -->
+    <div class="key"         style="left:1382px; top:196px; width:72px; height:72px" data-k="Num7">7</div>
+    <div class="key"         style="left:1456px; top:196px; width:72px; height:72px" data-k="Num8">8</div>
+    <div class="key"         style="left:1530px; top:196px; width:72px; height:72px" data-k="Num9">9</div>
+
+    <!-- Numpad 行 3 -->
+    <div class="key"         style="left:1382px; top:271px; width:72px; height:72px" data-k="Num4">4</div>
+    <div class="key"         style="left:1456px; top:271px; width:72px; height:72px" data-k="Num5">5</div>
+    <div class="key"         style="left:1530px; top:271px; width:72px; height:72px" data-k="Num6">6</div>
+
+    <!-- Numpad Enter: 双行高 y=346..492, h=146 -->
+    <div class="key"         style="left:1604px; top:346px; width:72px; height:146px" data-k="NumEnter">Enter</div>
+
+    <!-- Numpad 行 4 -->
+    <div class="key"         style="left:1382px; top:346px; width:72px; height:72px" data-k="Num1">1</div>
+    <div class="key"         style="left:1456px; top:346px; width:72px; height:72px" data-k="Num2">2</div>
+    <div class="key"         style="left:1530px; top:346px; width:72px; height:72px" data-k="Num3">3</div>
+
+    <!-- Numpad 行 5 (与主键盘 Ctrl 行同 y, h=71) -->
+    <div class="key"         style="left:1382px; top:421px; width:146px; height:71px" data-k="Num0">0</div>
+    <div class="key"         style="left:1530px; top:421px; width:72px;  height:71px" data-k="Num.">.</div>
+
+  </div>
+
+  <div class="legend">
+    108 键全尺寸键盘布局（含数字小键盘）。画布 1666×584，1u = 72 px。
+    主键盘区与 87 键版坐标完全一致（0..1156），右侧 1382..1676 为小键盘区。
+    点击按键高亮；按 Esc 取消。
+  </div>
+
+<script>
+  const keys = document.querySelectorAll('.key');
+  keys.forEach(k => {
+    k.addEventListener('click', () => {
+      keys.forEach(a => a.classList.remove('active'));
+      k.classList.add('active');
+    });
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') keys.forEach(a => a.classList.remove('active'));
+  });
+</script>
+</body>
+</html>

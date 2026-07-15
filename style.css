@@ -1,0 +1,71 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: #1e1f24;
+    width: 1440px;
+    height: 584px;
+    overflow: hidden;
+  }
+  body {
+    font-family: "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+    color: #e6e6e6;
+  }
+
+  /*
+    1:1 像素定位。每个键的 (left, top, width, height) 来自原图精确量测。
+    参考图: v2-cc8efaad7ef96cab06b7d96f43ef9ceb_1440w.jpg (1440 x 584)
+      - 1u = 72 px（87 键版）
+      - 1u = 64 px（108 键版，1440 / 22.5 ≈ 64）
+      - 6 行: F(71) / 数字(72) / Tab(72) / Caps(72) / Shift(72) / Ctrl(71)
+  */
+
+  .keyboard {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 1440px;
+    height: 584px;
+    background: #e8e8e8;
+    user-select: none;
+  }
+
+  .key {
+    position: absolute;
+    background: linear-gradient(180deg, #fafafa 0%, #d8d8d8 100%);
+    border: 1px solid #6a6c72;
+    border-radius: 4px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    font-size: 12px;
+    color: #2a2c30;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.85),
+      inset 0 -1px 0 rgba(0,0,0,0.08),
+      0 2px 0 #b8babf,
+      0 3px 2px rgba(0,0,0,0.20);
+    cursor: pointer;
+    text-align: center;
+    line-height: 1.1;
+    padding: 0 4px 5px 4px;
+    transition: transform 0.08s, background 0.15s, box-shadow 0.08s;
+    font-weight: 400;
+  }
+  .key:hover  {
+    background: linear-gradient(180deg, #ffffff 0%, #e6e6e6 100%);
+  }
+  .key.active {
+    transform: translateY(2px);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.85),
+      inset 0 -1px 0 rgba(0,0,0,0.08),
+      0 0 0 #b8babf,
+      0 1px 1px rgba(0,0,0,0.15);
+    background: linear-gradient(180deg, #4a90e2 0%, #357abd 100%);
+    color: #fff;
+  }
+  .key.fn-key { font-size: 13px; }
+  .key.fn-combo { font-size: 11px; line-height: 1.15; }
+
+  /* 子字符（shift 字符）显示在键左上 */
+  .key .sub  { position: absolute; top: 4px; left: 6px;  font-size: 10px; color: #5a5c63; font-weight: 400; }
+  .key.has-sub { padding-left: 13px; padding-bottom: 5px; }
