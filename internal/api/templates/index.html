@@ -849,192 +849,65 @@
     margin-bottom: 16px;
   }
 
-  .keyboard-row {
-    display: flex;
-    gap: 2px;
-    margin-bottom: 2px;
-    justify-content: center;
-  }
+  /* ========== 键盘热力图 ========== */
+  /* 1u = 40px，键位绝对坐标定位 */
 
-  .keyboard-key {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(26, 27, 46, 0.4);
-    border: 1px solid rgba(60, 65, 100, 0.5);
-    border-radius: 6px;
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--text);
-    transition: all 0.2s;
-    cursor: default;
-    min-width: 28px;
-    min-height: 40px;
-    padding: 0 4px;
+  .keyboard {
     position: relative;
-    overflow: hidden;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
+    background: rgba(26, 27, 46, 0.25);
+    border: 1px solid rgba(60, 65, 100, 0.4);
+    border-radius: 8px;
+    margin: 0 auto;
   }
 
-  .keyboard-key::before {
+  .kb-key {
+    position: absolute;
+    background: linear-gradient(180deg, rgba(40, 41, 70, 0.85) 0%, rgba(26, 27, 46, 0.85) 100%);
+    border: 1px solid rgba(120, 125, 160, 0.5);
+    border-radius: 4px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    font-size: 11px;
+    color: var(--text);
+    cursor: default;
+    text-align: center;
+    line-height: 1.1;
+    padding: 0 3px 3px 3px;
+    box-sizing: border-box;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    overflow: hidden;
+  }
+
+  .kb-key .sub {
+    position: absolute;
+    top: 2px;
+    left: 4px;
+    font-size: 9px;
+    color: rgba(180, 185, 210, 0.85);
+    font-weight: 400;
+  }
+
+  .kb-key.has-sub {
+    padding-left: 10px;
+  }
+
+  /* 热力 */
+  .kb-key.pressed {
+    border-color: rgba(255, 158, 100, 0.9);
+    box-shadow: 0 0 10px rgba(255, 158, 100, 0.4),
+                inset 0 0 0 1px rgba(255, 158, 100, 0.6);
+  }
+  .kb-key.pressed::after {
     content: '';
     position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: linear-gradient(135deg, rgba(255, 158, 100, 0.9), rgba(247, 118, 100, 0.7));
-    opacity: 0;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255, 158, 100, 0.85), rgba(247, 118, 100, 0.65));
+    opacity: var(--intensity, 0);
     transition: opacity 0.2s;
-    z-index: 0;
+    pointer-events: none;
+    border-radius: 4px;
   }
-
-  .keyboard-key.pressed::before {
-    opacity: calc(var(--intensity, 0));
-  }
-
-  .keyboard-key.pressed {
-    border-color: rgba(255, 158, 100, 0.8);
-    box-shadow: 0 0 20px rgba(255, 158, 100, 0.5), inset 0 1px 2px rgba(0, 0, 0, 0.3);
-  }
-
-  .keyboard-key .key-label {
-    position: relative;
-    z-index: 1;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-  }
-
-  /* 统一单位: 1u = 28px */
-  /* 半格宽度 (0.25u 步进) */
-  .keyboard-key.wide-025 { width: 35px; }  /* 1.25u */
-  .keyboard-key.wide-05  { width: 42px; }  /* 1.5u  */
-  .keyboard-key.wide-075 { width: 49px; }  /* 1.75u */
-  .keyboard-key.wide-125 { width: 70px; }  /* 2.5u  */
-  .keyboard-key.wide-15  { width: 84px; }  /* 3u    */
-  .keyboard-key.wide-175 { width: 98px; }  /* 3.5u  */
-  .keyboard-key.wide-225 { width: 112px; } /* 4u    */
-  .keyboard-key.wide-25  { width: 126px; } /* 4.5u  */
-  .keyboard-key.wide-275 { width: 140px; } /* 5u    */
-  .keyboard-key.wide-325 { width: 154px; } /* 5.5u  */
-  .keyboard-key.wide-35  { width: 168px; } /* 6u    */
-  .keyboard-key.wide-375 { width: 182px; } /* 6.5u  */
-  .keyboard-key.wide-425 { width: 196px; } /* 7u    */
-
-  /* ========== 87键标准 TKL 布局 ========== */
-  /* 基于真实 Cherry MX / Filco 87键精确测量 */
-  /* 1u = 28px, 0.25u 步进 */
-
-  .keyboard-87 .keyboard-row {
-    gap: 2px;
-    margin-bottom: 2px;
-    justify-content: flex-start;
-  }
-
-  .keyboard-87 .keyboard-key {
-    font-size: 9px;
-    min-height: 32px;
-    padding: 0 2px;
-  }
-  .keyboard-87 .keyboard-key.__gap__ {
-    background: transparent;
-    border-color: transparent;
-    box-shadow: none;
-  }
-
-  /* Row 1: Esc(1.5u) + F1-F12(各1u) */
-  .keyboard-87 .keyboard-row:nth-child(1) .keyboard-key.w15  { width: 42px; }
-
-  /* Row 2: 数字行 - BackSpace 2u = 56px */
-  .keyboard-87 .keyboard-row:nth-child(2) .keyboard-key.w2   { width: 56px; }
-
-  /* Row 3: QWERTY - Tab 1.5u, \ 1.5u */
-  .keyboard-87 .keyboard-row:nth-child(3) .keyboard-key.w15  { width: 42px; }
-
-  /* Row 4: ASDF - Caps 1.75u, Enter 2.25u */
-  .keyboard-87 .keyboard-row:nth-child(4) .keyboard-key.w175 { width: 49px; }
-  .keyboard-87 .keyboard-row:nth-child(4) .keyboard-key.w225 { width: 63px; }
-
-  /* Row 5: ZXCV - Shift_L 2.25u, Shift_R 2.75u */
-  .keyboard-87 .keyboard-row:nth-child(5) .keyboard-key.w225 { width: 63px; }
-  .keyboard-87 .keyboard-row:nth-child(5) .keyboard-key.w275 { width: 77px; }
-
-  /* Row 6: 空格 - Ctrl 1.5u, Win/Alt 1.25u, Space 6.25u, Fn 1.25u */
-  .keyboard-87 .keyboard-row:nth-child(6) .keyboard-key.w15  { width: 42px; }
-  .keyboard-87 .keyboard-row:nth-child(6) .keyboard-key.w125 { width: 35px; }
-  .keyboard-87 .keyboard-row:nth-child(6) .keyboard-key.w625 { width: 175px; }
-
-  /* Row 7-9: 编辑键 + 方向键 (全部 1.5u = 42px) */
-  .keyboard-87 .keyboard-row:nth-child(7) .keyboard-key,
-  .keyboard-87 .keyboard-row:nth-child(8) .keyboard-key,
-  .keyboard-87 .keyboard-row:nth-child(9) .keyboard-key {
-    width: 42px;
-  }
-
-  /* ========== 108键全尺寸布局 ========== */
-
-  .keyboard-108 .keyboard-row {
-    gap: 2px;
-    margin-bottom: 2px;
-    justify-content: flex-start;
-  }
-
-  .keyboard-108 .keyboard-key {
-    font-size: 9px;
-    min-height: 32px;
-    padding: 0 2px;
-  }
-  .keyboard-108 .keyboard-key.__gap__ {
-    background: transparent;
-    border-color: transparent;
-    box-shadow: none;
-  }
-
-  /* 主键盘区 + 导航区 布局 */
-  .keyboard-108 .keyboard-main {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-end;
-    gap: 4px;
-  }
-  .keyboard-108 .keyboard-nav {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    flex-shrink: 0;
-  }
-
-  /* Row 1: 功能键 */
-  .keyboard-108 .keyboard-row:nth-child(1) .keyboard-key.w15 { width: 42px; }
-
-  /* Row 2: 数字行 - BackSpace 2u = 56px */
-  .keyboard-108 .keyboard-row:nth-child(2) .keyboard-key.w2 { width: 56px; }
-
-  /* Row 3: QWERTY - Tab 2u, \ 1.5u */
-  .keyboard-108 .keyboard-row:nth-child(3) .keyboard-key.w2   { width: 56px; }
-  .keyboard-108 .keyboard-row:nth-child(3) .keyboard-key.w15  { width: 42px; }
-
-  /* Row 4: ASDF - Caps 2u, Enter 2.25u */
-  .keyboard-108 .keyboard-row:nth-child(4) .keyboard-key.w2   { width: 56px; }
-  .keyboard-108 .keyboard-row:nth-child(4) .keyboard-key.w225 { width: 63px; }
-
-  /* Row 5: ZXCV - Shift_L 2.25u, Shift_R 2.75u */
-  .keyboard-108 .keyboard-row:nth-child(5) .keyboard-key.w225 { width: 63px; }
-  .keyboard-108 .keyboard-row:nth-child(5) .keyboard-key.w275 { width: 77px; }
-
-  /* Row 6: 空格 - Ctrl 1.5u, Alt 1.25u, Space 6.25u */
-  .keyboard-108 .keyboard-row:nth-child(6) .keyboard-key.w15  { width: 42px; }
-  .keyboard-108 .keyboard-row:nth-child(6) .keyboard-key.w125 { width: 35px; }
-  .keyboard-108 .keyboard-row:nth-child(6) .keyboard-key.w625 { width: 175px; }
-
-  /* Row 7-9: 编辑键 + 方向键 (全部 1.5u) */
-  .keyboard-108 .keyboard-row:nth-child(7) .keyboard-key,
-  .keyboard-108 .keyboard-row:nth-child(8) .keyboard-key,
-  .keyboard-108 .keyboard-row:nth-child(9) .keyboard-key {
-    width: 42px;
-  }
-
-
-  /* 第五行: Ctrl Alt Space Alt Ctrl */
-  /* Alt: 1.25u = 35px, Space: 6.25u = 175px */
-  .keyboard-108 .keyboard-key.wide-025 { width: 35px; }
-  .keyboard-108 .keyboard-key.wide-625 { width: 175px; }
 </style>
 </head>
 <body>
@@ -1434,129 +1307,270 @@ function classifyKey(k) {
 // 键盘布局定义
 const KEYBOARD_LAYOUTS = {
   '87': {
-    name: '87键',
-    rows: [
-      // Row 1: Esc | F1-4 | F5-8 | F9-12 | PrtSc/Scroll/Pause
-      [
-        { key: 'Escape', label: 'Esc', width: 'w15' },
-        { key: '__gap__', label: '', width: 'w05' },
-        { key: 'F1', label: 'F1' }, { key: 'F2', label: 'F2' }, { key: 'F3', label: 'F3' }, { key: 'F4', label: 'F4' },
-        { key: '__gap__', label: '', width: 'w05' },
-        { key: 'F5', label: 'F5' }, { key: 'F6', label: 'F6' }, { key: 'F7', label: 'F7' }, { key: 'F8', label: 'F8' },
-        { key: '__gap__', label: '', width: 'w05' },
-        { key: 'F9', label: 'F9' }, { key: 'F10', label: 'F10' }, { key: 'F11', label: 'F11' }, { key: 'F12', label: 'F12' },
-        { key: 'Print', label: 'PrtSc' }, { key: 'ScrollLock', label: 'Scroll' }, { key: 'Pause', label: 'Pause' }
-      ],
-      // Row 2: 数字行 | Ins/Home/PgUp
-      [
-        { key: '`', label: '`' }, { key: '1', label: '1' }, { key: '2', label: '2' }, { key: '3', label: '3' },
-        { key: '4', label: '4' }, { key: '5', label: '5' }, { key: '6', label: '6' },
-        { key: '7', label: '7' }, { key: '8', label: '8' }, { key: '9', label: '9' },
-        { key: '0', label: '0' }, { key: '-', label: '-' }, { key: '=', label: '=' },
-        { key: 'BackSpace', label: '←', width: 'w2' },
-        { key: 'Insert', label: 'Ins', width: 'w15' },
-        { key: 'Home', label: 'Home', width: 'w15' },
-        { key: 'PageUp', label: 'PgUp', width: 'w15' }
-      ],
-      // Row 3: QWERTY | Del/End/PgDn
-      [
-        { key: 'Tab', label: 'Tab', width: 'w15' },
-        { key: 'q', label: 'Q' }, { key: 'w', label: 'W' }, { key: 'e', label: 'E' }, { key: 'r', label: 'R' },
-        { key: 't', label: 'T' }, { key: 'y', label: 'Y' }, { key: 'u', label: 'U' }, { key: 'i', label: 'I' },
-        { key: 'o', label: 'O' }, { key: 'p', label: 'P' },
-        { key: '[', label: '[' }, { key: ']', label: ']' }, { key: '\\', label: '\\', width: 'w15' },
-        { key: 'Delete', label: 'Del', width: 'w15' },
-        { key: 'End', label: 'End', width: 'w15' },
-        { key: 'PageDown', label: 'PgDn', width: 'w15' }
-      ],
-      // Row 4: ASDF
-      [
-        { key: 'Caps_Lock', label: 'Caps', width: 'w175' },
-        { key: 'a', label: 'A' }, { key: 's', label: 'S' }, { key: 'd', label: 'D' }, { key: 'f', label: 'F' },
-        { key: 'g', label: 'G' }, { key: 'h', label: 'H' }, { key: 'j', label: 'J' },
-        { key: 'k', label: 'K' }, { key: 'l', label: 'L' },
-        { key: ';', label: ';' }, { key: "'", label: "'" }, { key: 'Enter', label: 'Enter', width: 'w225' }
-      ],
-      // Row 5: ZXCV
-      [
-        { key: 'Shift_L', label: 'Shift', width: 'w225' },
-        { key: 'z', label: 'Z' }, { key: 'x', label: 'X' }, { key: 'c', label: 'C' }, { key: 'v', label: 'V' },
-        { key: 'b', label: 'B' }, { key: 'n', label: 'N' }, { key: 'm', label: 'M' },
-        { key: ',', label: ',' }, { key: '.', label: '.' }, { key: '/', label: '/' },
-        { key: 'Shift_R', label: 'Shift', width: 'w275' }
-      ],
-      // Row 6: 空格键
-      [
-        { key: 'Control_L', label: 'Ctrl', width: 'w15' },
-        { key: 'Super_L', label: 'Win', width: 'w125' },
-        { key: 'Alt_L', label: 'Alt', width: 'w125' },
-        { key: ' ', label: '', width: 'w625' },
-        { key: 'Alt_R', label: 'Alt', width: 'w125' },
-        { key: 'Super_R', label: 'Win', width: 'w125' },
-        { key: 'Menu', label: 'Menu', width: 'w125' },
-        { key: 'Control_R', label: 'Ctrl', width: 'w15' }
-      ],
-      // Row 7: ↑ (above arrow cluster)
-      [
-        { key: 'Up', label: '↑', width: 'w15' }
-      ],
-      // Row 8: ← ↓ → (inverted-T, right-aligned)
-      [
-        { key: 'Left', label: '←', width: 'w15' },
-        { key: 'Down', label: '↓', width: 'w15' },
-        { key: 'Right', label: '→', width: 'w15' }
-      ]
+    name: '87键 TKL',
+    width: 800,
+    height: 324,
+    aliases: {
+      '`': '`', '~': '`',
+      '-': '-', '_': '-',
+      '=': '=', '+': '=',
+      '[': '[', '{': '[',
+      ']': ']', '}': ']',
+      '\\': '\\', '|': '\\',
+      ';': ';', ':': ';',
+      "'": "'", '"': "'",
+      ',': ',', '<': ',',
+      '.': '.', '>': '.',
+      '/': '/', '?': '/',
+      'LShift': 'LShift', 'RShift': 'RShift',
+      'LCtrl': 'LCtrl', 'RCtrl': 'RCtrl',
+      'LAlt': 'LAlt', 'RAlt': 'RAlt',
+      'LWin': 'LWin', 'RWin': 'RWin',
+      'Backspace': 'Backspace',
+      'Ins': 'Ins', 'Del': 'Del',
+      'Caps': 'Caps', 'Tab': 'Tab',
+      'Enter': 'Enter', 'Esc': 'Esc', 'Escape': 'Esc',
+      'Space': 'Space',
+      '↑': '↑', '↓': '↓', '←': '←', '→': '→',
+      'PrtSc': 'PrtSc', 'ScrLk': 'ScrLk', 'Pause': 'Pause',
+    },
+    keys: [
+      { k: 'Esc', l: 26, t: 26, w: 40, h: 39, label: 'Esc' },
+      { k: 'F1', l: 67, t: 26, w: 40, h: 39, label: 'F1' },
+      { k: 'F2', l: 108, t: 26, w: 40, h: 39, label: 'F2' },
+      { k: 'F3', l: 149, t: 26, w: 40, h: 39, label: 'F3' },
+      { k: 'F4', l: 190, t: 26, w: 40, h: 39, label: 'F4' },
+      { k: 'F5', l: 272, t: 26, w: 40, h: 39, label: 'F5' },
+      { k: 'F6', l: 313, t: 26, w: 40, h: 39, label: 'F6' },
+      { k: 'F7', l: 354, t: 26, w: 40, h: 39, label: 'F7' },
+      { k: 'F8', l: 396, t: 26, w: 40, h: 39, label: 'F8' },
+      { k: 'F9', l: 478, t: 26, w: 40, h: 39, label: 'F9' },
+      { k: 'F10', l: 519, t: 26, w: 40, h: 39, label: 'F10' },
+      { k: 'F11', l: 560, t: 26, w: 40, h: 39, label: 'F11' },
+      { k: 'F12', l: 601, t: 26, w: 40, h: 39, label: 'F12' },
+      { k: 'PrtSc', l: 643, t: 26, w: 40, h: 39, label: 'PrtSc' },
+      { k: 'ScrLk', l: 684, t: 26, w: 40, h: 39, label: 'Scroll<br>Lock' },
+      { k: 'Pause', l: 726, t: 26, w: 40, h: 39, label: 'Pause<br>Break' },
+      { k: '`', l: 26, t: 67, w: 40, h: 40, label: '`', sub: '~' },
+      { k: '1', l: 67, t: 67, w: 40, h: 40, label: '1', sub: '!' },
+      { k: '2', l: 108, t: 67, w: 40, h: 40, label: '2', sub: '@' },
+      { k: '3', l: 149, t: 67, w: 40, h: 40, label: '3', sub: '#' },
+      { k: '4', l: 190, t: 67, w: 40, h: 40, label: '4', sub: '$' },
+      { k: '5', l: 231, t: 67, w: 40, h: 40, label: '5', sub: '%' },
+      { k: '6', l: 272, t: 67, w: 40, h: 40, label: '6', sub: '^' },
+      { k: '7', l: 313, t: 67, w: 40, h: 40, label: '7', sub: '&' },
+      { k: '8', l: 354, t: 67, w: 40, h: 40, label: '8', sub: '*' },
+      { k: '9', l: 396, t: 67, w: 40, h: 40, label: '9', sub: '(' },
+      { k: '0', l: 437, t: 67, w: 40, h: 40, label: '0', sub: ')' },
+      { k: '-', l: 478, t: 67, w: 40, h: 40, label: '-', sub: '_' },
+      { k: '=', l: 519, t: 67, w: 40, h: 40, label: '=', sub: '+' },
+      { k: 'Backspace', l: 560, t: 67, w: 81, h: 40, label: 'Backspace' },
+      { k: 'Ins', l: 643, t: 67, w: 40, h: 40, label: 'Insert' },
+      { k: 'Home', l: 684, t: 67, w: 40, h: 40, label: 'Home' },
+      { k: 'PgUp', l: 726, t: 67, w: 40, h: 40, label: 'PgUp' },
+      { k: 'Tab', l: 26, t: 109, w: 40, h: 40, label: 'Tab' },
+      { k: 'q', l: 67, t: 109, w: 40, h: 40, label: 'Q' },
+      { k: 'w', l: 108, t: 109, w: 40, h: 40, label: 'W' },
+      { k: 'e', l: 149, t: 109, w: 40, h: 40, label: 'E' },
+      { k: 'r', l: 190, t: 109, w: 40, h: 40, label: 'R' },
+      { k: 't', l: 231, t: 109, w: 40, h: 40, label: 'T' },
+      { k: 'y', l: 272, t: 109, w: 40, h: 40, label: 'Y' },
+      { k: 'u', l: 313, t: 109, w: 40, h: 40, label: 'U' },
+      { k: 'i', l: 354, t: 109, w: 40, h: 40, label: 'I' },
+      { k: 'o', l: 396, t: 109, w: 40, h: 40, label: 'O' },
+      { k: 'p', l: 437, t: 109, w: 40, h: 40, label: 'P' },
+      { k: '[', l: 478, t: 109, w: 40, h: 40, label: '[', sub: '{' },
+      { k: ']', l: 519, t: 109, w: 40, h: 40, label: ']', sub: '}' },
+      { k: '\\', l: 560, t: 109, w: 81, h: 40, label: '\\' },
+      { k: 'Del', l: 643, t: 109, w: 40, h: 40, label: 'Delete' },
+      { k: 'End', l: 684, t: 109, w: 40, h: 40, label: 'End' },
+      { k: 'PgDn', l: 726, t: 109, w: 40, h: 40, label: 'PgDn' },
+      { k: 'Caps', l: 26, t: 151, w: 60, h: 40, label: 'Caps Lock', sub: '⇪' },
+      { k: 'a', l: 87, t: 151, w: 40, h: 40, label: 'A' },
+      { k: 's', l: 128, t: 151, w: 40, h: 40, label: 'S' },
+      { k: 'd', l: 169, t: 151, w: 40, h: 40, label: 'D' },
+      { k: 'f', l: 211, t: 151, w: 40, h: 40, label: 'F' },
+      { k: 'g', l: 252, t: 151, w: 40, h: 40, label: 'G' },
+      { k: 'h', l: 293, t: 151, w: 40, h: 40, label: 'H' },
+      { k: 'j', l: 334, t: 151, w: 40, h: 40, label: 'J' },
+      { k: 'k', l: 375, t: 151, w: 40, h: 40, label: 'K' },
+      { k: 'l', l: 416, t: 151, w: 40, h: 40, label: 'L' },
+      { k: ';', l: 457, t: 151, w: 40, h: 40, label: ';', sub: ':' },
+      { k: '\'', l: 498, t: 151, w: 40, h: 40, label: '\'', sub: '"' },
+      { k: 'Enter', l: 539, t: 151, w: 103, h: 40, label: 'Enter', sub: '↵' },
+      { k: 'LShift', l: 26, t: 192, w: 91, h: 40, label: 'Shift', sub: '⇧' },
+      { k: 'z', l: 118, t: 192, w: 40, h: 40, label: 'Z' },
+      { k: 'x', l: 159, t: 192, w: 40, h: 40, label: 'X' },
+      { k: 'c', l: 200, t: 192, w: 40, h: 40, label: 'C' },
+      { k: 'v', l: 241, t: 192, w: 40, h: 40, label: 'V' },
+      { k: 'b', l: 282, t: 192, w: 40, h: 40, label: 'B' },
+      { k: 'n', l: 323, t: 192, w: 40, h: 40, label: 'N' },
+      { k: 'm', l: 364, t: 192, w: 40, h: 40, label: 'M' },
+      { k: ',', l: 406, t: 192, w: 40, h: 40, label: ',', sub: '<' },
+      { k: '.', l: 447, t: 192, w: 40, h: 40, label: '.', sub: '>' },
+      { k: '/', l: 488, t: 192, w: 40, h: 40, label: '/', sub: '?' },
+      { k: 'RShift', l: 529, t: 192, w: 113, h: 40, label: 'Shift', sub: '⇧' },
+      { k: '↑', l: 684, t: 192, w: 40, h: 40, label: '↑' },
+      { k: 'LCtrl', l: 26, t: 234, w: 50, h: 39, label: 'Ctrl' },
+      { k: 'LWin', l: 77, t: 234, w: 49, h: 39, label: 'Win' },
+      { k: 'LAlt', l: 128, t: 234, w: 50, h: 39, label: 'Alt' },
+      { k: 'Space', l: 180, t: 234, w: 256, h: 39, label: ' ' },
+      { k: 'RAlt', l: 438, t: 234, w: 50, h: 39, label: 'Alt' },
+      { k: 'RWin', l: 489, t: 234, w: 49, h: 39, label: 'Win' },
+      { k: 'Fn', l: 541, t: 234, w: 50, h: 39, label: 'Fn' },
+      { k: 'RCtrl', l: 593, t: 234, w: 49, h: 39, label: 'Ctrl' },
+      { k: '←', l: 643, t: 234, w: 40, h: 39, label: '←' },
+      { k: '↓', l: 684, t: 234, w: 40, h: 39, label: '↓' },
+      { k: '→', l: 726, t: 234, w: 40, h: 39, label: '→' },
     ]
   },
   '108': {
-    name: '108键',
-    rows: [
-      // 第一行 (BackSpace: 2u = 56px)
-      [
-        { key: '`', label: '`' }, { key: '1', label: '1' }, { key: '2', label: '2' }, { key: '3', label: '3' },
-        { key: '4', label: '4' }, { key: '5', label: '5' }, { key: '6', label: '6' },
-        { key: '7', label: '7' }, { key: '8', label: '8' }, { key: '9', label: '9' },
-        { key: '0', label: '0' }, { key: '-', label: '-' }, { key: '=', label: '=' },
-        { key: 'BackSpace', label: '←', width: 'w2' }
-      ],
-      // 第二行 (Tab: 2u = 56px, \: 1.5u = 42px)
-      [
-        { key: 'Tab', label: 'Tab', width: 'w2' },
-        { key: 'q', label: 'Q' }, { key: 'w', label: 'W' }, { key: 'e', label: 'E' }, { key: 'r', label: 'R' },
-        { key: 't', label: 'T' }, { key: 'y', label: 'Y' }, { key: 'u', label: 'U' }, { key: 'i', label: 'I' },
-        { key: 'o', label: 'O' }, { key: 'p', label: 'P' },
-        { key: '[', label: '[' }, { key: ']', label: ']' }, { key: '\\', label: '\\', width: 'w15' }
-      ],
-      // 第三行 (Caps: 2u = 56px, Enter: 5u = 140px)
-      [
-        { key: 'Caps_Lock', label: 'Caps', width: 'w175' },
-        { key: 'a', label: 'A' }, { key: 's', label: 'S' }, { key: 'd', label: 'D' }, { key: 'f', label: 'F' },
-        { key: 'g', label: 'G' }, { key: 'h', label: 'H' }, { key: 'j', label: 'J' },
-        { key: 'k', label: 'K' }, { key: 'l', label: 'L' },
-        { key: ';', label: ';' }, { key: "'", label: "'" },
-        { key: 'Enter', label: 'Enter', width: 'w225' }
-      ],
-      // 第四行 (Shift_L: 5u = 140px, Shift_R: 6u = 168px)
-      [
-        { key: 'Shift_L', label: 'Shift', width: 'w275' },
-        { key: 'z', label: 'Z' }, { key: 'x', label: 'X' }, { key: 'c', label: 'C' }, { key: 'v', label: 'V' },
-        { key: 'b', label: 'B' }, { key: 'n', label: 'N' }, { key: 'm', label: 'M' },
-        { key: ',', label: ',' }, { key: '.', label: '.' }, { key: '/', label: '/' },
-        { key: 'Shift_R', label: 'Shift', width: 'w275' }
-      ],
-      // 第五行 (Alt: 1.25u = 35px, Space: 6.25u = 175px)
-      [
-        { key: 'Control_L', label: 'Ctrl', width: 'w15' },
-        { key: 'Alt_L', label: 'Alt', width: 'w125' },
-        { key: ' ', label: '', width: 'w625' },
-        { key: 'Alt_R', label: 'Alt', width: 'w125' },
-        { key: 'Control_R', label: 'Ctrl', width: 'w15' }
-      ]
+    name: '108键 全尺寸',
+    width: 925,
+    height: 324,
+    aliases: {
+      '`': '`', '~': '`',
+      '-': '-', '_': '-',
+      '=': '=', '+': '=',
+      '[': '[', '{': '[',
+      ']': ']', '}': ']',
+      '\\': '\\', '|': '\\',
+      ';': ';', ':': ';',
+      "'": "'", '"': "'",
+      ',': ',', '<': ',',
+      '.': '.', '>': '.',
+      '/': '/', '?': '/',
+      'LShift': 'LShift', 'RShift': 'RShift',
+      'LCtrl': 'LCtrl', 'RCtrl': 'RCtrl',
+      'LAlt': 'LAlt', 'RAlt': 'RAlt',
+      'LWin': 'LWin', 'RWin': 'RWin',
+      'Backspace': 'Backspace',
+      'Ins': 'Ins', 'Del': 'Del',
+      'Caps': 'Caps', 'Tab': 'Tab',
+      'Enter': 'Enter', 'Esc': 'Esc', 'Escape': 'Esc',
+      'Space': 'Space',
+      '↑': '↑', '↓': '↓', '←': '←', '→': '→',
+      'PrtSc': 'PrtSc', 'ScrLk': 'ScrLk', 'Pause': 'Pause',
+      'NumLock': 'NumLock',
+      'Num/': 'Num/', 'Num*': 'Num*', 'Num-': 'Num-', 'Num+': 'Num+',
+      'NumEnter': 'NumEnter',
+      'Num0': 'Num0', 'Num1': 'Num1', 'Num2': 'Num2', 'Num3': 'Num3',
+      'Num4': 'Num4', 'Num5': 'Num5', 'Num6': 'Num6',
+      'Num7': 'Num7', 'Num8': 'Num8', 'Num9': 'Num9',
+      'Num.': 'Num.',
+    },
+    keys: [
+      { k: 'Esc', l: 26, t: 26, w: 40, h: 39, label: 'Esc' },
+      { k: 'F1', l: 67, t: 26, w: 40, h: 39, label: 'F1' },
+      { k: 'F2', l: 108, t: 26, w: 40, h: 39, label: 'F2' },
+      { k: 'F3', l: 149, t: 26, w: 40, h: 39, label: 'F3' },
+      { k: 'F4', l: 190, t: 26, w: 40, h: 39, label: 'F4' },
+      { k: 'F5', l: 272, t: 26, w: 40, h: 39, label: 'F5' },
+      { k: 'F6', l: 313, t: 26, w: 40, h: 39, label: 'F6' },
+      { k: 'F7', l: 354, t: 26, w: 40, h: 39, label: 'F7' },
+      { k: 'F8', l: 396, t: 26, w: 40, h: 39, label: 'F8' },
+      { k: 'F9', l: 478, t: 26, w: 40, h: 39, label: 'F9' },
+      { k: 'F10', l: 519, t: 26, w: 40, h: 39, label: 'F10' },
+      { k: 'F11', l: 560, t: 26, w: 40, h: 39, label: 'F11' },
+      { k: 'F12', l: 601, t: 26, w: 40, h: 39, label: 'F12' },
+      { k: 'PrtSc', l: 643, t: 26, w: 40, h: 39, label: 'PrtSc' },
+      { k: 'ScrLk', l: 684, t: 26, w: 40, h: 39, label: 'Scroll<br>Lock' },
+      { k: 'Pause', l: 726, t: 26, w: 40, h: 39, label: 'Pause<br>Break' },
+      { k: '`', l: 26, t: 67, w: 40, h: 40, label: '`', sub: '~' },
+      { k: '1', l: 67, t: 67, w: 40, h: 40, label: '1', sub: '!' },
+      { k: '2', l: 108, t: 67, w: 40, h: 40, label: '2', sub: '@' },
+      { k: '3', l: 149, t: 67, w: 40, h: 40, label: '3', sub: '#' },
+      { k: '4', l: 190, t: 67, w: 40, h: 40, label: '4', sub: '$' },
+      { k: '5', l: 231, t: 67, w: 40, h: 40, label: '5', sub: '%' },
+      { k: '6', l: 272, t: 67, w: 40, h: 40, label: '6', sub: '^' },
+      { k: '7', l: 313, t: 67, w: 40, h: 40, label: '7', sub: '&' },
+      { k: '8', l: 354, t: 67, w: 40, h: 40, label: '8', sub: '*' },
+      { k: '9', l: 396, t: 67, w: 40, h: 40, label: '9', sub: '(' },
+      { k: '0', l: 437, t: 67, w: 40, h: 40, label: '0', sub: ')' },
+      { k: '-', l: 478, t: 67, w: 40, h: 40, label: '-', sub: '_' },
+      { k: '=', l: 519, t: 67, w: 40, h: 40, label: '=', sub: '+' },
+      { k: 'Backspace', l: 560, t: 67, w: 81, h: 40, label: 'Backspace' },
+      { k: 'Ins', l: 643, t: 67, w: 40, h: 40, label: 'Insert' },
+      { k: 'Home', l: 684, t: 67, w: 40, h: 40, label: 'Home' },
+      { k: 'PgUp', l: 726, t: 67, w: 40, h: 40, label: 'PgUp' },
+      { k: 'Tab', l: 26, t: 109, w: 40, h: 40, label: 'Tab' },
+      { k: 'q', l: 67, t: 109, w: 40, h: 40, label: 'Q' },
+      { k: 'w', l: 108, t: 109, w: 40, h: 40, label: 'W' },
+      { k: 'e', l: 149, t: 109, w: 40, h: 40, label: 'E' },
+      { k: 'r', l: 190, t: 109, w: 40, h: 40, label: 'R' },
+      { k: 't', l: 231, t: 109, w: 40, h: 40, label: 'T' },
+      { k: 'y', l: 272, t: 109, w: 40, h: 40, label: 'Y' },
+      { k: 'u', l: 313, t: 109, w: 40, h: 40, label: 'U' },
+      { k: 'i', l: 354, t: 109, w: 40, h: 40, label: 'I' },
+      { k: 'o', l: 396, t: 109, w: 40, h: 40, label: 'O' },
+      { k: 'p', l: 437, t: 109, w: 40, h: 40, label: 'P' },
+      { k: '[', l: 478, t: 109, w: 40, h: 40, label: '[', sub: '{' },
+      { k: ']', l: 519, t: 109, w: 40, h: 40, label: ']', sub: '}' },
+      { k: '\\', l: 560, t: 109, w: 81, h: 40, label: '\\' },
+      { k: 'Del', l: 643, t: 109, w: 40, h: 40, label: 'Delete' },
+      { k: 'End', l: 684, t: 109, w: 40, h: 40, label: 'End' },
+      { k: 'PgDn', l: 726, t: 109, w: 40, h: 40, label: 'PgDn' },
+      { k: 'Caps', l: 26, t: 151, w: 60, h: 40, label: 'Caps Lock', sub: '⇪' },
+      { k: 'a', l: 87, t: 151, w: 40, h: 40, label: 'A' },
+      { k: 's', l: 128, t: 151, w: 40, h: 40, label: 'S' },
+      { k: 'd', l: 169, t: 151, w: 40, h: 40, label: 'D' },
+      { k: 'f', l: 211, t: 151, w: 40, h: 40, label: 'F' },
+      { k: 'g', l: 252, t: 151, w: 40, h: 40, label: 'G' },
+      { k: 'h', l: 293, t: 151, w: 40, h: 40, label: 'H' },
+      { k: 'j', l: 334, t: 151, w: 40, h: 40, label: 'J' },
+      { k: 'k', l: 375, t: 151, w: 40, h: 40, label: 'K' },
+      { k: 'l', l: 416, t: 151, w: 40, h: 40, label: 'L' },
+      { k: ';', l: 457, t: 151, w: 40, h: 40, label: ';', sub: ':' },
+      { k: '\'', l: 498, t: 151, w: 40, h: 40, label: '\'', sub: '"' },
+      { k: 'Enter', l: 539, t: 151, w: 103, h: 40, label: 'Enter', sub: '↵' },
+      { k: 'LShift', l: 26, t: 192, w: 91, h: 40, label: 'Shift', sub: '⇧' },
+      { k: 'z', l: 118, t: 192, w: 40, h: 40, label: 'Z' },
+      { k: 'x', l: 159, t: 192, w: 40, h: 40, label: 'X' },
+      { k: 'c', l: 200, t: 192, w: 40, h: 40, label: 'C' },
+      { k: 'v', l: 241, t: 192, w: 40, h: 40, label: 'V' },
+      { k: 'b', l: 282, t: 192, w: 40, h: 40, label: 'B' },
+      { k: 'n', l: 323, t: 192, w: 40, h: 40, label: 'N' },
+      { k: 'm', l: 364, t: 192, w: 40, h: 40, label: 'M' },
+      { k: ',', l: 406, t: 192, w: 40, h: 40, label: ',', sub: '<' },
+      { k: '.', l: 447, t: 192, w: 40, h: 40, label: '.', sub: '>' },
+      { k: '/', l: 488, t: 192, w: 40, h: 40, label: '/', sub: '?' },
+      { k: 'RShift', l: 529, t: 192, w: 113, h: 40, label: 'Shift', sub: '⇧' },
+      { k: '↑', l: 684, t: 192, w: 40, h: 40, label: '↑' },
+      { k: 'LCtrl', l: 26, t: 234, w: 50, h: 39, label: 'Ctrl' },
+      { k: 'LWin', l: 77, t: 234, w: 49, h: 39, label: 'Win' },
+      { k: 'LAlt', l: 128, t: 234, w: 50, h: 39, label: 'Alt' },
+      { k: 'Space', l: 180, t: 234, w: 256, h: 39, label: ' ' },
+      { k: 'RAlt', l: 438, t: 234, w: 50, h: 39, label: 'Alt' },
+      { k: 'RWin', l: 489, t: 234, w: 49, h: 39, label: 'Win' },
+      { k: 'Fn', l: 541, t: 234, w: 50, h: 39, label: 'Fn' },
+      { k: 'RCtrl', l: 593, t: 234, w: 49, h: 39, label: 'Ctrl' },
+      { k: '←', l: 643, t: 234, w: 40, h: 39, label: '←' },
+      { k: '↓', l: 684, t: 234, w: 40, h: 39, label: '↓' },
+      { k: '→', l: 726, t: 234, w: 40, h: 39, label: '→' },
+      // 数字小键盘 (Numpad)
+      { k: 'NumLock', l: 768, t: 67, w: 40, h: 40, label: 'Num<br>Lock' },
+      { k: 'Num/', l: 809, t: 67, w: 40, h: 40, label: '/' },
+      { k: 'Num*', l: 850, t: 67, w: 40, h: 40, label: '*' },
+      { k: 'Num-', l: 891, t: 67, w: 40, h: 40, label: '−' },
+      { k: 'Num+', l: 891, t: 109, w: 40, h: 81, label: '+' },
+      { k: 'Num7', l: 768, t: 109, w: 40, h: 40, label: '7' },
+      { k: 'Num8', l: 809, t: 109, w: 40, h: 40, label: '8' },
+      { k: 'Num9', l: 850, t: 109, w: 40, h: 40, label: '9' },
+      { k: 'Num4', l: 768, t: 151, w: 40, h: 40, label: '4' },
+      { k: 'Num5', l: 809, t: 151, w: 40, h: 40, label: '5' },
+      { k: 'Num6', l: 850, t: 151, w: 40, h: 40, label: '6' },
+      { k: 'NumEnter', l: 891, t: 192, w: 40, h: 81, label: 'Enter' },
+      { k: 'Num1', l: 768, t: 192, w: 40, h: 40, label: '1' },
+      { k: 'Num2', l: 809, t: 192, w: 40, h: 40, label: '2' },
+      { k: 'Num3', l: 850, t: 192, w: 40, h: 40, label: '3' },
+      { k: 'Num0', l: 768, t: 234, w: 81, h: 39, label: '0' },
+      { k: 'Num.', l: 850, t: 234, w: 40, h: 39, label: '.' },
     ]
   }
 };
 
-  function renderKeyboard(data) {
+
+function renderKeyboard(data) {
   const keyboardEl = document.getElementById("keyboard");
   const appData = data.apps[appFilter];
   if (!appData) return;
@@ -1564,52 +1578,32 @@ const KEYBOARD_LAYOUTS = {
   const layout = KEYBOARD_LAYOUTS[state.keyboardLayout];
   if (!layout) return;
 
-  const maxCount = Math.max(...Object.values(appData.keys), 1);
+  // 用别名映射把 API 里的 key 名归一化到布局里的 k
+  const aliasMap = layout.aliases || {};
+  const counts = {};
+  for (const [rawKey, rawCount] of Object.entries(appData.keys)) {
+    const norm = aliasMap[rawKey] !== undefined ? aliasMap[rawKey] : rawKey;
+    counts[norm] = (counts[norm] || 0) + rawCount;
+  }
+  const maxCount = Math.max(...Object.values(counts), 1);
 
-  const keyboardHtml = `
+  const keysHtml = layout.keys.map(k => {
+    const count = counts[k.k] || 0;
+    const intensity = count > 0 ? Math.sqrt(count / maxCount) : 0;
+    const sub = k.sub ? `<span class="sub">${k.sub}</span>` : '';
+    const pressed = count > 0 ? 'pressed' : '';
+    const style = `left:${k.l}px;top:${k.t}px;width:${k.w}px;height:${k.h}px;${count > 0 ? `--intensity:${intensity};` : ''}`;
+    return `<div class="kb-key ${pressed}" data-key="${escapeHtml(k.k)}" title="${escapeHtml(k.k)}: ${count}" style="${style}">${sub}<span>${k.label}</span></div>`;
+  }).join('');
+
+  keyboardEl.innerHTML = `
     <div class="keyboard-container fade-in">
       <div class="keyboard-title">键盘热力图 (${layout.name})</div>
-      <div class="keyboard-${state.keyboardLayout}">
-        <div class="keyboard-main">
-          ${layout.rows.slice(0, 6).map((row, rowIdx) => `
-            <div class="keyboard-row">
-              ${row.map(({ key, label, width }) => {
-                if (key === '__gap__') {
-                  return `<div class="keyboard-key ${width || ''}" style="visibility:hidden"><span class="key-label">${label || key}</span></div>`;
-                }
-                const count = appData.keys[key] || 0;
-                const intensity = count > 0 ? Math.sqrt(count / maxCount) : 0;
-                return `
-                  <div class="keyboard-key ${width || ''} ${count > 0 ? 'pressed' : ''}"
-                       style="${count > 0 ? `--intensity: ${intensity};` : ''}">
-                    <span class="key-label">${label || key}</span>
-                  </div>
-                `;
-              }).join('')}
-            </div>
-          `).join('')}
-        </div>
-        <div class="keyboard-nav">
-          ${layout.navRows.map((row, rowIdx) => `
-            <div class="keyboard-row">
-              ${row.map(({ key, label, width }) => {
-                const count = appData.keys[key] || 0;
-                const intensity = count > 0 ? Math.sqrt(count / maxCount) : 0;
-                return `
-                  <div class="keyboard-key ${width || ''} ${count > 0 ? 'pressed' : ''}"
-                       style="${count > 0 ? `--intensity: ${intensity};` : ''}">
-                    <span class="key-label">${label || key}</span>
-                  </div>
-                `;
-              }).join('')}
-            </div>
-          `).join('')}
-        </div>
+      <div class="keyboard kb-${state.keyboardLayout}" style="width:${layout.width}px;height:${layout.height}px;">
+        ${keysHtml}
       </div>
     </div>
   `;
-
-  keyboardEl.innerHTML = keyboardHtml;
 }
 
 refresh();
