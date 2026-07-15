@@ -186,14 +186,14 @@
     line-height: 1.4;
   }
 
-  .gran-select {
+  .seg-control {
     display: flex; gap: 8px; margin-bottom: 20px; align-items: center; flex-wrap: wrap;
   }
-  .gran-select .label {
+  .seg-control .label {
     color: var(--muted); font-size: 11px; letter-spacing: 0.06em; margin-right: 8px;
     font-weight: 500;
   }
-  .gran-select button {
+  .seg-control button {
     background: var(--panel);
     color: var(--muted);
     border: 1px solid var(--border);
@@ -206,7 +206,7 @@
     position: relative;
     overflow: hidden;
   }
-  .gran-select button::before {
+  .seg-control button::before {
     content: '';
     position: absolute;
     inset: 0;
@@ -214,22 +214,29 @@
     opacity: 0;
     transition: opacity 0.2s;
   }
-  .gran-select button span {
+  .seg-control button span {
     position: relative;
     z-index: 1;
   }
-  .gran-select button:hover {
+  .seg-control button:hover {
     color: var(--text);
     border-color: var(--accent-2);
     transform: translateY(-1px);
     box-shadow: var(--shadow-sm);
   }
-  .gran-select button.active {
+  .seg-control button.active {
     background: linear-gradient(135deg, var(--accent), var(--accent-2));
     color: var(--bg);
     border-color: var(--accent);
     font-weight: 600;
     box-shadow: 0 0 20px rgba(122, 162, 247, 0.3);
+  }
+
+  /* 87 / 108 切换按钮: 跟粒度按钮同等样式 + 多一点左侧间距 */
+  .keyboard-layout {
+    margin-left: 12px;
+    padding-left: 12px;
+    border-left: 1px solid var(--border);
   }
 
   .chart {
@@ -925,7 +932,7 @@
 <div id="err"></div>
 <main>
   <div class="stats-row" id="statsRow"></div>
-  <div class="gran-select" id="granSelect">
+  <div class="seg-control" id="granSelect">
     <span class="label">趋势</span>
     <button data-g="" class="active">关闭</button>
     <button data-g="hour">时</button>
@@ -935,7 +942,7 @@
     <button data-g="year">年</button>
   </div>
   <div id="chart"></div>
-  <div class="keyboard-layout" id="keyboardLayout" style="display: none;">
+  <div class="seg-control keyboard-layout" id="keyboardLayout" style="display: none;">
     <span class="label">键盘</span>
     <button data-layout="87" class="active">87键</button>
     <button data-layout="108">108键</button>
