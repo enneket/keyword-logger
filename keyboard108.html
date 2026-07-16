@@ -7,7 +7,7 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body {
     background: #1e1f24;
-    width: 1666px;
+    width: 1748px;
     height: 584px;
     overflow: hidden;
   }
@@ -29,7 +29,7 @@
     position: absolute;
     left: 0;
     top: 0;
-    width: 1666px;
+    width: 1748px;
     height: 584px;
     background: #e8e8e8;
     user-select: none;
@@ -256,8 +256,7 @@
     <!--
       ============================================================
       数字小键盘区 (Numpad) — 位于主键盘右侧
-      区段起始 x = 1382, 结束 x = 1676
-      与主键盘之间留有约 4 px 间隙 (主键盘最右 → 1378..1382 间隙)
+      区段起始 x = 1410, 结束 x = 1630（右边缘 +46px padding 与左侧对齐）
       4 列 x 5 行，1u = 72 px
       + 与 Enter 各占两行高
       ============================================================
@@ -271,45 +270,45 @@
       Numpad 行 4 (y=346, h=72):
         1 / 2 / 3 / Enter (双行高 346..492)
       Numpad 行 5 (y=421, h=71) — 与主键盘 Ctrl 行同 y:
-        0(2u 1382..1528) / .
+        0(2u 1410..1558) / .
     -->
 
     <!-- Numpad 行 1 -->
-    <div class="key"         style="left:1382px; top:121px; width:72px; height:72px" data-k="NumLock">Num<br>Lock</div>
-    <div class="key"         style="left:1456px; top:121px; width:72px; height:72px" data-k="Num/">/</div>
-    <div class="key"         style="left:1530px; top:121px; width:72px; height:72px" data-k="Num*">*</div>
-    <div class="key"         style="left:1604px; top:121px; width:72px; height:72px" data-k="Num-">−</div>
+    <div class="key"         style="left:1410px; top:121px; width:72px; height:72px" data-k="NumLock">Num<br>Lock</div>
+    <div class="key"         style="left:1484px; top:121px; width:72px; height:72px" data-k="Num/">/</div>
+    <div class="key"         style="left:1558px; top:121px; width:72px; height:72px" data-k="Num*">*</div>
+    <div class="key"         style="left:1630px; top:121px; width:72px; height:72px" data-k="Num-">−</div>
 
     <!-- Numpad +: 双行高 y=196..342, h=146 -->
-    <div class="key"         style="left:1604px; top:196px; width:72px; height:146px" data-k="Num+">+</div>
+    <div class="key"         style="left:1630px; top:196px; width:72px; height:146px" data-k="Num+">+</div>
 
     <!-- Numpad 行 2 -->
-    <div class="key"         style="left:1382px; top:196px; width:72px; height:72px" data-k="Num7">7</div>
-    <div class="key"         style="left:1456px; top:196px; width:72px; height:72px" data-k="Num8">8</div>
-    <div class="key"         style="left:1530px; top:196px; width:72px; height:72px" data-k="Num9">9</div>
+    <div class="key"         style="left:1410px; top:196px; width:72px; height:72px" data-k="Num7">7</div>
+    <div class="key"         style="left:1484px; top:196px; width:72px; height:72px" data-k="Num8">8</div>
+    <div class="key"         style="left:1558px; top:196px; width:72px; height:72px" data-k="Num9">9</div>
 
     <!-- Numpad 行 3 -->
-    <div class="key"         style="left:1382px; top:271px; width:72px; height:72px" data-k="Num4">4</div>
-    <div class="key"         style="left:1456px; top:271px; width:72px; height:72px" data-k="Num5">5</div>
-    <div class="key"         style="left:1530px; top:271px; width:72px; height:72px" data-k="Num6">6</div>
+    <div class="key"         style="left:1410px; top:271px; width:72px; height:72px" data-k="Num4">4</div>
+    <div class="key"         style="left:1484px; top:271px; width:72px; height:72px" data-k="Num5">5</div>
+    <div class="key"         style="left:1558px; top:271px; width:72px; height:72px" data-k="Num6">6</div>
 
     <!-- Numpad Enter: 双行高 y=346..492, h=146 -->
-    <div class="key"         style="left:1604px; top:346px; width:72px; height:146px" data-k="NumEnter">Enter</div>
+    <div class="key"         style="left:1630px; top:346px; width:72px; height:146px" data-k="NumEnter">Enter</div>
 
     <!-- Numpad 行 4 -->
-    <div class="key"         style="left:1382px; top:346px; width:72px; height:72px" data-k="Num1">1</div>
-    <div class="key"         style="left:1456px; top:346px; width:72px; height:72px" data-k="Num2">2</div>
-    <div class="key"         style="left:1530px; top:346px; width:72px; height:72px" data-k="Num3">3</div>
+    <div class="key"         style="left:1410px; top:346px; width:72px; height:72px" data-k="Num1">1</div>
+    <div class="key"         style="left:1484px; top:346px; width:72px; height:72px" data-k="Num2">2</div>
+    <div class="key"         style="left:1558px; top:346px; width:72px; height:72px" data-k="Num3">3</div>
 
     <!-- Numpad 行 5 (与主键盘 Ctrl 行同 y, h=71) -->
-    <div class="key"         style="left:1382px; top:421px; width:146px; height:71px" data-k="Num0">0</div>
-    <div class="key"         style="left:1530px; top:421px; width:72px;  height:71px" data-k="Num.">.</div>
+    <div class="key"         style="left:1410px; top:421px; width:146px; height:71px" data-k="Num0">0</div>
+    <div class="key"         style="left:1558px; top:421px; width:72px;  height:71px" data-k="Num.">.</div>
 
   </div>
 
   <div class="legend">
-    108 键全尺寸键盘布局（含数字小键盘）。画布 1666×584，1u = 72 px。
-    主键盘区与 87 键版坐标完全一致（0..1156），右侧 1382..1676 为小键盘区。
+    108 键全尺寸键盘布局（含数字小键盘）。画布 1676×584，1u = 72 px。
+    主键盘区与 87 键版坐标完全一致（0..1156），小键盘区 1410..1698，左右 padding 各 46 px。
     点击按键高亮；按 Esc 取消。
   </div>
 
