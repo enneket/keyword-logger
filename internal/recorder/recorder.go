@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"keyword-logger/internal/counter"
+	"keyword-logger/internal/persist"
 	"keyword-logger/internal/window"
 )
 
@@ -190,15 +191,15 @@ type Recorder struct {
 	stopCh      chan struct{}
 	km          *keycodeMapper
 	display     string
+	saver       *persist.Saver
 
 	// 防抖合并：累积窗口内的按键，批量写入
 	pending     map[string]map[string]int64
-	flushCh     chan struct{}
 }
 
 const flushInterval = 100 * time.Millisecond
 
-func New(c *counter.Counter, t *window.Tracker) *Recorder {
+func New(c *counter.Counter, t *window.Tracker, saver *persist.Saver) *Recorder {
 	display := os.Getenv("DISPLAY")
 	if display == "" {
 		display = ":0"
@@ -206,11 +207,11 @@ func New(c *counter.Counter, t *window.Tracker) *Recorder {
 	return &Recorder{
 		counter:  c,
 		tracker:  t,
+		saver:    saver,
 		stopCh:   make(chan struct{}),
 		km:       newKeycodeMapper(),
 		display:  display,
 		pending:  make(map[string]map[string]int64),
-		flushCh:  make(chan struct{}, 1),
 	}
 }
 
@@ -246,6 +247,10 @@ func (r *Recorder) flush() {
 	r.mu.Unlock()
 
 	r.counter.Merge(toFlush)
+	// 同步持久化本批按键，避免 Saver 全量 snapshot 重复叠加
+	if r.saver != nil {
+		r.saver.SaveBatch(toFlush)
+	}
 }
 
 func (r *Recorder) record(app, keyName string) {

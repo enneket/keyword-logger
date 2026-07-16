@@ -268,6 +268,13 @@ type Snapshot struct {
 	Data      map[string]map[string]map[string]int64 `json:"data"`
 }
 
+// CurrentBucket returns the current time bucket string.
+func (c *Counter) CurrentBucket() string {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	return time.Now().Format(BucketFormat)
+}
+
 func (c *Counter) Snapshot() Snapshot {
 	c.mu.RLock()
 	defer c.mu.RUnlock()

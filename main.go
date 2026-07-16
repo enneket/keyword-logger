@@ -8,7 +8,6 @@ import (
 	"os/signal"
 	"path/filepath"
 	"syscall"
-	"time"
 
 	"keyword-logger/internal/api"
 	"keyword-logger/internal/counter"
@@ -44,14 +43,16 @@ func main() {
 
 	tracker.Refresh()
 
-	rec := recorder.New(c, tracker)
+	saver := persist.New(*storePath, 0, c)
+	if err := saver.Init(); err != nil {
+		log.Fatalf("persist init: %v", err)
+	}
+
+	rec := recorder.New(c, tracker, saver)
 
 	if err := rec.Start(); err != nil {
 		log.Fatalf("recorder: %v", err)
 	}
-
-	saver := persist.New(*storePath, 10*time.Second, c)
-	go saver.Start()
 
 	apiServer := api.New(*port, c)
 

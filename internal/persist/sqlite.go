@@ -23,31 +23,26 @@ CREATE TABLE IF NOT EXISTS key_events (
 CREATE INDEX IF NOT EXISTS idx_bucket ON key_events(bucket);
 `
 
+const upsertStmt = `
+INSERT INTO key_events (app, bucket, key, count) VALUES (?, ?, ?, ?)
+ON CONFLICT(app, bucket, key) DO UPDATE SET count = count + excluded.count;
+`
+
 type Saver struct {
 	path    string
-	interval time.Duration
 	c       *counter.Counter
 	stopCh  chan struct{}
 }
 
-func New(path string, interval time.Duration, c *counter.Counter) *Saver {
+func New(path string, _ time.Duration, c *counter.Counter) *Saver {
 	return &Saver{
-		path:     path,
-		interval: interval,
-		c:        c,
-		stopCh:   make(chan struct{}),
+		path:    path,
+		c:       c,
+		stopCh: make(chan struct{}),
 	}
 }
 
-func (s *Saver) Start() {
-	if err := s.init(); err != nil {
-		log.Printf("persist: init failed: %v", err)
-		return
-	}
-	go s.loop()
-}
-
-func (s *Saver) init() error {
+func (s *Saver) Init() error {
 	dir := filepath.Dir(s.path)
 	if err := os.MkdirAll(dir, 0755); err != nil {
 		return err
@@ -71,34 +66,11 @@ func (s *Saver) open() (*sql.DB, error) {
 	return db, nil
 }
 
-func (s *Saver) loop() {
-	ticker := time.NewTicker(s.interval)
-	defer ticker.Stop()
-	s.save()
-	for {
-		select {
-		case <-ticker.C:
-			s.save()
-		case <-s.stopCh:
-			s.save()
-			return
-		}
-	}
-}
-
-func (s *Saver) Stop() {
-	close(s.stopCh)
-}
-
-const upsertStmt = `
-INSERT INTO key_events (app, bucket, key, count) VALUES (?, ?, ?, ?)
-ON CONFLICT(app, bucket, key) DO UPDATE SET count = count + excluded.count;
-`
-
-func (s *Saver) save() {
-	snap := s.c.Snapshot()
-
-	if len(snap.Data) == 0 {
+// SaveBatch persists a batch of key counts (from Recorder's pending buffer).
+// This is called from Recorder.flush() after the batch has been merged into
+// the Counter, ensuring each batch is written exactly once.
+func (s *Saver) SaveBatch(batch map[string]map[string]int64) {
+	if len(batch) == 0 {
 		return
 	}
 
@@ -123,13 +95,12 @@ func (s *Saver) save() {
 	}
 	defer stmt.Close()
 
-	for app, buckets := range snap.Data {
-		for bucket, keys := range buckets {
-			for key, count := range keys {
-				if _, err := stmt.Exec(app, bucket, key, count); err != nil {
-					log.Printf("persist: exec failed: %v", err)
-					return
-				}
+	for app, keys := range batch {
+		bucket := s.c.CurrentBucket()
+		for key, count := range keys {
+			if _, err := stmt.Exec(app, bucket, key, count); err != nil {
+				log.Printf("persist: exec failed: %v", err)
+				return
 			}
 		}
 	}
@@ -137,6 +108,10 @@ func (s *Saver) save() {
 	if err := tx.Commit(); err != nil {
 		log.Printf("persist: commit failed: %v", err)
 	}
+}
+
+func (s *Saver) Stop() {
+	close(s.stopCh)
 }
 
 func LoadFromFile(path string, c *counter.Counter) error {
@@ -175,7 +150,7 @@ func LoadFromFile(path string, c *counter.Counter) error {
 		return err
 	}
 
-	// 保留现有 Version（不覆盖 New() 设置的初始值）
+	// 保留现有的 Version（不覆盖 New() 设置的初始值）
 	snap := counter.Snapshot{Data: data}
 	snap.Version = c.Version
 	c.Restore(snap)
