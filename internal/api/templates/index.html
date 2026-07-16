@@ -1013,10 +1013,21 @@ function animateNumber(el, from, to, duration = 600) {
   requestAnimationFrame(update);
 }
 
-// 深度对比两个数据对象，返回是否有变化
+// 快速对比数据是否有变化，避免 JSON.stringify 全量深比较
 function dataChanged(a, b) {
   if (!a || !b) return true;
-  return JSON.stringify(a) !== JSON.stringify(b);
+  if (a.total !== b.total) return true;
+  const aApps = a.apps || {}, bApps = b.apps || {};
+  const aKeys = Object.keys(aApps), bKeys = Object.keys(bApps);
+  if (aKeys.length !== bKeys.length) return true;
+  for (let i = 0; i < aKeys.length; i++) {
+    const k = aKeys[i];
+    if (aApps[k].total !== bApps[k].total) return true;
+    const aKeyCount = Object.keys(aApps[k].keys || {}).length;
+    const bKeyCount = Object.keys(bApps[k].keys || {}).length;
+    if (aKeyCount !== bKeyCount) return true;
+  }
+  return false;
 }
 
 function getDotClass(i) {
@@ -1050,7 +1061,12 @@ function render(data) {
   if (!dataChanged(lastData, data)) {
     return;
   }
-  lastData = JSON.parse(JSON.stringify(data));
+  // 只存需要用的字段，避免全量深克隆
+  lastData = {
+    total: data.total,
+    apps: Object.fromEntries(
+      Object.entries(data.apps || {}).map(([n, s]) => [n, { total: s.total, keys: { ...s.keys } }])
+  };
 
   document.getElementById("since").textContent = "始于 " + data.started_at;
 
