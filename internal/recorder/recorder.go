@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"strings"
 	"sync"
+	"time"
 
 	"keyword-logger/internal/counter"
 	"keyword-logger/internal/window"
@@ -183,13 +184,19 @@ func (km *keycodeMapper) keycodeToName(kc byte) string {
 }
 
 type Recorder struct {
-	mu       sync.Mutex
-	counter  *counter.Counter
-	tracker  *window.Tracker
-	stopCh   chan struct{}
-	km       *keycodeMapper
-	display  string
+	mu          sync.Mutex
+	counter     *counter.Counter
+	tracker     *window.Tracker
+	stopCh      chan struct{}
+	km          *keycodeMapper
+	display     string
+
+	// 防抖合并：累积窗口内的按键，批量写入
+	pending     map[string]map[string]int64
+	flushCh     chan struct{}
 }
+
+const flushInterval = 100 * time.Millisecond
 
 func New(c *counter.Counter, t *window.Tracker) *Recorder {
 	display := os.Getenv("DISPLAY")
@@ -197,19 +204,57 @@ func New(c *counter.Counter, t *window.Tracker) *Recorder {
 		display = ":0"
 	}
 	return &Recorder{
-		counter: c,
-		tracker: t,
-		stopCh:  make(chan struct{}),
-		km:      newKeycodeMapper(),
-		display: display,
+		counter:  c,
+		tracker:  t,
+		stopCh:   make(chan struct{}),
+		km:       newKeycodeMapper(),
+		display:  display,
+		pending:  make(map[string]map[string]int64),
+		flushCh:  make(chan struct{}, 1),
 	}
 }
 
 func (r *Recorder) Start() error {
 	r.km.refresh()
-
+	go r.flushLoop()
 	go r.inputLoop()
 	return nil
+}
+
+func (r *Recorder) flushLoop() {
+	ticker := time.NewTicker(flushInterval)
+	defer ticker.Stop()
+	for {
+		select {
+		case <-ticker.C:
+			r.flush()
+		case <-r.stopCh:
+			r.flush()
+			return
+		}
+	}
+}
+
+func (r *Recorder) flush() {
+	r.mu.Lock()
+	if len(r.pending) == 0 {
+		r.mu.Unlock()
+		return
+	}
+	toFlush := r.pending
+	r.pending = make(map[string]map[string]int64)
+	r.mu.Unlock()
+
+	r.counter.Merge(toFlush)
+}
+
+func (r *Recorder) record(app, keyName string) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if r.pending[app] == nil {
+		r.pending[app] = make(map[string]int64)
+	}
+	r.pending[app][keyName]++
 }
 
 func (r *Recorder) findKeyboardDevices() ([]int, error) {
@@ -304,10 +349,11 @@ func (r *Recorder) watchDevice(deviceID int) {
 		}
 
 		keyName := r.km.keycodeToName(kc)
-		r.counter.Increment(app, keyName)
+		r.record(app, keyName)
 	}
 }
 
 func (r *Recorder) Stop() {
 	close(r.stopCh)
+	r.flush()
 }

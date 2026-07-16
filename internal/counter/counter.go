@@ -94,6 +94,30 @@ func (c *Counter) Increment(app, key string) {
 	c.UpdatedAt = time.Now().Format(time.RFC3339)
 }
 
+// Merge atomically adds a batch of key counts from the pending buffer.
+// Each entry is (app -> (key -> count)).
+func (c *Counter) Merge(batch map[string]map[string]int64) {
+	if len(batch) == 0 {
+		return
+	}
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	t := time.Now()
+	bucket := t.Format(BucketFormat)
+	for app, keys := range batch {
+		if c.Data[app] == nil {
+			c.Data[app] = make(map[string]map[string]int64)
+		}
+		if c.Data[app][bucket] == nil {
+			c.Data[app][bucket] = make(map[string]int64)
+		}
+		for key, count := range keys {
+			c.Data[app][bucket][key] += count
+		}
+	}
+	c.UpdatedAt = t.Format(time.RFC3339)
+}
+
 type AppStats struct {
 	Total int64            `json:"total"`
 	Keys  map[string]int64 `json:"keys"`
