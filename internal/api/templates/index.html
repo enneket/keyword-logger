@@ -983,7 +983,8 @@ document.querySelectorAll("#granSelect button").forEach((btn) => {
     document.querySelectorAll("#granSelect button").forEach((b) => b.classList.remove("active"));
     btn.classList.add("active");
     state.granularity = btn.dataset.g;
-    refresh();
+    // 按钮点击时即时拉取，不等长轮询超时
+    fetchStats();
   });
 });
 
@@ -1055,15 +1056,23 @@ function getDotClass(i) {
 const COLORS = ["#7aa2f7","#bb9af7","#9ece6a","#ff9e64","#7dcfff","#f7768e","#73daca","#ff9e64","#9ece6a","#e0af68"];
 
 let lastUpdatedAt = "";
+let longPollAbort = null;
 
 async function longPoll() {
+  // 取消上一次未完成的请求
+  if (longPollAbort) {
+    longPollAbort.abort();
+  }
+  const controller = new AbortController();
+  longPollAbort = controller;
+
   const q = new URLSearchParams();
   if (lastUpdatedAt) q.set("since", lastUpdatedAt);
   if (appFilter) q.set("app", appFilter);
   if (state.granularity) q.set("granularity", state.granularity);
   const url = "/stats/longpoll" + (q.toString() ? "?" + q.toString() : "");
   try {
-    const r = await fetch(url, { cache: "no-store" });
+    const r = await fetch(url, { cache: "no-store", signal: controller.signal });
     if (!r.ok) throw new Error("HTTP " + r.status);
     const data = await r.json();
     if (data.updated_at && data.updated_at !== lastUpdatedAt) {
@@ -1073,16 +1082,31 @@ async function longPoll() {
     const errEl = document.getElementById("err");
     if (errEl.textContent) errEl.style.display = "none";
   } catch (e) {
+    if (e.name === "AbortError") return; // 被主动取消，正常
     console.error('Long poll failed:', e);
     const errEl = document.getElementById("err");
     errEl.textContent = "▸ 请求失败: " + e.message;
     errEl.style.display = "block";
-    // 出错后 3 秒再试
     setTimeout(longPoll, 3000);
     return;
   }
-  // 立即发起下一次长轮询
   longPoll();
+}
+
+// 按钮点击时即时拉取最新数据
+async function fetchStats() {
+  const q = new URLSearchParams();
+  if (appFilter) q.set("app", appFilter);
+  if (state.granularity) q.set("granularity", state.granularity);
+  const url = "/stats" + (q.toString() ? "?" + q.toString() : "");
+  try {
+    const r = await fetch(url, { cache: "no-store" });
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    const data = await r.json();
+    render(data);
+  } catch (e) {
+    console.error('Fetch stats failed:', e);
+  }
 }
 
 function render(data) {
