@@ -1036,24 +1036,35 @@ function getDotClass(i) {
 
 const COLORS = ["#7aa2f7","#bb9af7","#9ece6a","#ff9e64","#7dcfff","#f7768e","#73daca","#ff9e64","#9ece6a","#e0af68"];
 
-async function refresh() {
+let lastUpdatedAt = "";
+
+async function longPoll() {
   const q = new URLSearchParams();
+  if (lastUpdatedAt) q.set("since", lastUpdatedAt);
   if (appFilter) q.set("app", appFilter);
   if (state.granularity) q.set("granularity", state.granularity);
-  const url = "/stats" + (q.toString() ? "?" + q.toString() : "");
+  const url = "/stats/longpoll" + (q.toString() ? "?" + q.toString() : "");
   try {
     const r = await fetch(url, { cache: "no-store" });
     if (!r.ok) throw new Error("HTTP " + r.status);
     const data = await r.json();
-    render(data);
+    if (data.updated_at && data.updated_at !== lastUpdatedAt) {
+      lastUpdatedAt = data.updated_at;
+      render(data);
+    }
     const errEl = document.getElementById("err");
     if (errEl.textContent) errEl.style.display = "none";
   } catch (e) {
-    console.error('Refresh failed:', e);
+    console.error('Long poll failed:', e);
     const errEl = document.getElementById("err");
     errEl.textContent = "▸ 请求失败: " + e.message;
     errEl.style.display = "block";
+    // 出错后 3 秒再试
+    setTimeout(longPoll, 3000);
+    return;
   }
+  // 立即发起下一次长轮询
+  longPoll();
 }
 
 function render(data) {
@@ -1065,8 +1076,9 @@ function render(data) {
   lastData = {
     total: data.total,
     apps: Object.fromEntries(
-      Object.entries(data.apps || {}).map(([n, s]) => [n, { total: s.total, keys: { ...s.keys } }])
+      Object.entries(data.apps || {}).map(([n, s) => [n, { total: s.total, keys: { ...s.keys } }])
   };
+  if (data.updated_at) lastUpdatedAt = data.updated_at;
 
   document.getElementById("since").textContent = "始于 " + data.started_at;
 
@@ -1606,8 +1618,7 @@ function renderKeyboard(data) {
   `;
 }
 
-refresh();
-setInterval(refresh, 5000);
+longPoll();
 </script>
 </body>
 </html>

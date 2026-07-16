@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	_ "embed"
 	"encoding/json"
 	"fmt"
@@ -11,6 +12,7 @@ import (
 )
 
 const timeFormat = "2006-01-02T15:04"
+const longPollTimeout = 30 * time.Second
 
 //go:embed templates/index.html
 var indexHTML []byte
@@ -27,6 +29,7 @@ func New(port int, c *counter.Counter) *Server {
 	s := &Server{counter: c}
 	mux := http.NewServeMux()
 	mux.HandleFunc("/stats", s.handleStats)
+	mux.HandleFunc("/stats/longpoll", s.handleLongPoll)
 	mux.HandleFunc("/health", s.handleHealth)
 	mux.HandleFunc("/summary", s.handleSummary)
 	mux.HandleFunc("/favicon.svg", s.handleFavicon)
@@ -77,6 +80,31 @@ func (s *Server) handleStats(w http.ResponseWriter, r *http.Request) {
 
 	stats := s.counter.GetStats(since, until, app, gran)
 
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(stats)
+}
+
+func (s *Server) handleLongPoll(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	since := r.URL.Query().Get("since")
+
+	ctx, cancel := context.WithTimeout(r.Context(), longPollTimeout)
+	defer cancel()
+
+	_, err := s.counter.WaitForUpdate(ctx, since)
+	if err != nil {
+		// timeout or cancelled - return empty to trigger immediate re-poll
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte("{}"))
+		return
+	}
+
+	// Data changed, return current stats
+	stats := s.counter.GetStats(time.Time{}, time.Time{}, "", "")
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(stats)
 }

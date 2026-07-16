@@ -1,6 +1,7 @@
 package counter
 
 import (
+	"context"
 	"sort"
 	"sync"
 	"time"
@@ -69,6 +70,7 @@ type Counter struct {
 	StartedAt string                            `json:"started_at"`
 	UpdatedAt string                            `json:"updated_at"`
 	Data      map[string]map[string]map[string]int64 `json:"data"`
+	notifyCh  chan struct{}
 }
 
 func New() *Counter {
@@ -76,6 +78,7 @@ func New() *Counter {
 		Version:   1,
 		StartedAt: time.Now().Format(time.RFC3339),
 		Data:      make(map[string]map[string]map[string]int64),
+		notifyCh:  make(chan struct{}, 1),
 	}
 }
 
@@ -91,7 +94,35 @@ func (c *Counter) Increment(app, key string) {
 		c.Data[app][bucket] = make(map[string]int64)
 	}
 	c.Data[app][bucket][key]++
-	c.UpdatedAt = time.Now().Format(time.RFC3339)
+	c.UpdatedAt = t.Format(time.RFC3339)
+	c.notify()
+}
+
+// notify sends a non-blocking notification that data has changed.
+func (c *Counter) notify() {
+	select {
+	case c.notifyCh <- struct{}{}:
+	default:
+	}
+}
+
+// WaitForUpdate blocks until UpdatedAt changes from since, or until the
+// context is cancelled. Returns the current UpdatedAt on notification.
+func (c *Counter) WaitForUpdate(ctx context.Context, since string) (string, error) {
+	for {
+		c.mu.RLock()
+		current := c.UpdatedAt
+		c.mu.RUnlock()
+		if current != since {
+			return current, nil
+		}
+		select {
+		case <-c.notifyCh:
+			continue
+		case <-ctx.Done():
+			return current, ctx.Err()
+		}
+	}
 }
 
 // Merge atomically adds a batch of key counts from the pending buffer.
@@ -116,6 +147,7 @@ func (c *Counter) Merge(batch map[string]map[string]int64) {
 		}
 	}
 	c.UpdatedAt = t.Format(time.RFC3339)
+	c.notify()
 }
 
 type AppStats struct {
