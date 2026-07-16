@@ -175,7 +175,9 @@ func LoadFromFile(path string, c *counter.Counter) error {
 		return err
 	}
 
-	// 保留现有的 StartedAt（服务启动时间），只恢复数据
-	c.Restore(counter.Snapshot{Data: data})
+	// 保留现有 Version（不覆盖 New() 设置的初始值）
+	snap := counter.Snapshot{Data: data}
+	snap.Version = c.Version
+	c.Restore(snap)
 	return nil
 }
