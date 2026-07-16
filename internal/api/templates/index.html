@@ -1192,7 +1192,8 @@ function renderChart(data) {
   }
 
   // 淡入更新
-  const chartHtml = `<div class="chart fade-in">
+  const fadeClass = existingChart ? "" : "fade-in";
+  const chartHtml = `<div class="chart ${fadeClass}">
     <div class="chart-header">
       <span>${headLabel}</span>
       <span class="range">${escapeHtml(first)} → ${escapeHtml(last)} · ${buckets.length} 个区间</span>
@@ -1206,17 +1207,7 @@ function renderChart(data) {
     }).join("")}</div>
   </div>`;
 
-  // 平滑过渡：先淡出，再更新，再淡入
-  if (existingChart) {
-    root.style.opacity = "0.6";
-    root.style.transition = "opacity 0.15s";
-    setTimeout(() => {
-      root.innerHTML = chartHtml;
-      root.style.opacity = "1";
-    }, 150);
-  } else {
-    root.innerHTML = chartHtml;
-  }
+  root.innerHTML = chartHtml;
 }
 
 function renderApps(root, apps) {
@@ -1252,7 +1243,8 @@ function renderApps(root, apps) {
 
   const maxTotal = apps[0][1].total;
 
-  root.innerHTML = `<div class="app-table fade-in" data-apps-sig="${signature}">
+  const fadeClass = existingTable ? "" : "fade-in";
+  root.innerHTML = `<div class="app-table ${fadeClass}" data-apps-sig="${signature}">
     <div class="table-header">
       <span class="col-rank">#</span>
       <span class="col-name">应用</span>
@@ -1586,8 +1578,10 @@ function renderKeyboard(data) {
     return `<div class="kb-key ${pressed}" data-key="${escapeHtml(k.k)}" title="${escapeHtml(k.k)}: ${count}" style="${style}">${sub}<span>${k.label}</span></div>`;
   }).join('');
 
+  const hasKeyboard = keyboardEl.querySelector(".keyboard-container") !== null;
+  const fadeClass = hasKeyboard ? "" : "fade-in";
   keyboardEl.innerHTML = `
-    <div class="keyboard-container fade-in">
+    <div class="keyboard-container ${fadeClass}">
       <div class="keyboard-title">键盘热力图 (${layout.name})</div>
       <div class="keyboard kb-${state.keyboardLayout}" style="width:${layout.width}px;height:${layout.height}px;">
         ${keysHtml}
