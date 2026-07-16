@@ -27,7 +27,7 @@ func main() {
 		if err != nil {
 			log.Fatalf("cannot get home dir: %v", err)
 		}
-		*storePath = filepath.Join(home, ".local", "share", "keyword-logger", "stats.json")
+		*storePath = filepath.Join(home, ".local", "share", "keyword-logger", "stats.db")
 	}
 
 	c := counter.New()

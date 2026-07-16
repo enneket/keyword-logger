@@ -336,6 +336,19 @@
     font-size: 10px;
     letter-spacing: 0.08em;
     font-weight: 600;
+    position: sticky;
+    top: 0;
+    background: var(--panel);
+    z-index: 1;
+  }
+  .app-table .table-body {
+    max-height: 480px;
+    overflow-y: auto;
+  }
+  .app-row {
+    content-visibility: auto;
+    contain-intrinsic-size: 0 52px;
+  }
     text-transform: uppercase;
     background: rgba(122, 162, 247, 0.02);
   }
@@ -1247,7 +1260,7 @@ function renderApps(root, apps) {
   const existingTable = root.querySelector(".app-table");
   if (existingTable && existingTable.dataset.appsSig === signature) {
     // 增量更新数字
-    const rows = existingTable.querySelectorAll(".app-row");
+    const rows = existingTable.querySelectorAll(".table-body .app-row");
     rows.forEach((row, i) => {
       const [name, stats] = apps[i];
       if (!name) return;
@@ -1279,6 +1292,7 @@ function renderApps(root, apps) {
       <span class="col-keys">按键数</span>
       <span class="col-bar">占比</span>
     </div>
+    <div class="table-body">
     ${apps.map(([name, s], i) => {
       const pct = (s.total / maxTotal * 100).toFixed(1);
       return `<a href="/app?app=${encodeURIComponent(name)}" class="app-row">
@@ -1293,6 +1307,7 @@ function renderApps(root, apps) {
         </span>
       </a>`;
     }).join("")}
+    </div>
   </div>`;
 }
 
