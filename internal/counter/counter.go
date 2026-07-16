@@ -181,9 +181,7 @@ func (c *Counter) GetStats(since, until time.Time, appFilter, granularity string
 		out.Buckets = collapsed
 	}
 
-	if since.IsZero() && until.IsZero() && appFilter == "" {
-		out.UpdatedAt = c.UpdatedAt
-	}
+	out.UpdatedAt = c.UpdatedAt
 
 	return out
 }
