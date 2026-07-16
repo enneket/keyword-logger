@@ -20,6 +20,9 @@ var indexHTML []byte
 //go:embed templates/icon.svg
 var faviconSVG []byte
 
+//go:embed keyboard-layouts.json
+var keyboardLayoutsJSON []byte
+
 type Server struct {
 	counter *counter.Counter
 	server  *http.Server
@@ -30,6 +33,7 @@ func New(port int, c *counter.Counter) *Server {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/stats", s.handleStats)
 	mux.HandleFunc("/stats/longpoll", s.handleLongPoll)
+	mux.HandleFunc("/keyboard-layouts.json", s.handleKeyboardLayouts)
 	mux.HandleFunc("/health", s.handleHealth)
 	mux.HandleFunc("/summary", s.handleSummary)
 	mux.HandleFunc("/favicon.svg", s.handleFavicon)
@@ -107,6 +111,15 @@ func (s *Server) handleLongPoll(w http.ResponseWriter, r *http.Request) {
 	stats := s.counter.GetStats(time.Time{}, time.Time{}, "", "")
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(stats)
+}
+
+func (s *Server) handleKeyboardLayouts(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(keyboardLayoutsJSON)
 }
 
 func (s *Server) handleHealth(w http.ResponseWriter, r *http.Request) {
