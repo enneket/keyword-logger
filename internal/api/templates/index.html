@@ -960,8 +960,13 @@ window.onunhandledrejection = function(event) {
 };
 
 const escapeHtml = (s) => String(s)
-  .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-  .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+  .replace(/&/g, '&amp;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;')
+  .replace(/'/g, '&#39;')
+  .replace(/`/g, '&#96;')
+  .replace(/\$/g, '&#36;');
 
 const params = new URLSearchParams(location.search);
 const appFilter = params.get("app") || "";
@@ -1089,7 +1094,7 @@ function render(data) {
   lastData = {
     total: data.total,
     apps: Object.fromEntries(
-      Object.entries(data.apps || {}).map(([n, s) => [n, { total: s.total, keys: { ...s.keys } }])
+      Object.entries(data.apps || {}).map(([n, s]) => [n, { total: s.total, keys: { ...s.keys } }]))
   };
   if (data.updated_at) lastUpdatedAt = data.updated_at;
 
