@@ -16,9 +16,9 @@ import (
 	"keyword-logger/internal/window"
 )
 
-//go:generate sh -c "git describe --tags --always --dirty 2>/dev/null | tr -d '\\n' > version.txt"
+//go:generate sh -c "git describe --tags --always --dirty 2>/dev/null | sed 's/^v//' | tr -d '\\n' > version.txt"
 // Injected at build time via ldflags:
-//   go build -ldflags "-X main.appVersion=$(git describe --tags --always --dirty)"
+//   go build -ldflags "-X main.appVersion=$(git describe --tags --always --dirty | sed 's/^v//')"
 var appVersion = "dev"
 
 func main() {
