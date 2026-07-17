@@ -66,7 +66,7 @@ func bucketKey(t time.Time, g Granularity) string {
 
 type Counter struct {
 	mu        sync.RWMutex
-	Version   int                               `json:"version"`
+	Version   string                            `json:"version"`
 	StartedAt string                            `json:"started_at"`
 	UpdatedAt string                            `json:"updated_at"`
 	Data      map[string]map[string]map[string]int64 `json:"data"`
@@ -75,7 +75,7 @@ type Counter struct {
 
 func New() *Counter {
 	return &Counter{
-		Version:   1,
+		Version:   "dev",
 		StartedAt: time.Now().Format(time.RFC3339),
 		Data:      make(map[string]map[string]map[string]int64),
 		notifyCh:  make(chan struct{}, 1),
@@ -161,7 +161,7 @@ type BucketPoint struct {
 }
 
 type StatsOutput struct {
-	Version     int                 `json:"version"`
+	Version     string                 `json:"version"`
 	StartedAt   string              `json:"started_at"`
 	UpdatedAt   string              `json:"updated_at"`
 	Total       int64               `json:"total"`
@@ -262,7 +262,7 @@ func collapseBuckets(in []BucketPoint) []BucketPoint {
 }
 
 type Snapshot struct {
-	Version   int                                    `json:"version"`
+	Version   string                                    `json:"version"`
 	StartedAt string                                 `json:"started_at"`
 	UpdatedAt string                                 `json:"updated_at"`
 	Data      map[string]map[string]map[string]int64 `json:"data"`

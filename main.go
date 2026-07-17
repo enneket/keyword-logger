@@ -16,6 +16,11 @@ import (
 	"keyword-logger/internal/window"
 )
 
+//go:generate sh -c "git describe --tags --always --dirty 2>/dev/null | tr -d '\\n' > version.txt"
+// Injected at build time via ldflags:
+//   go build -ldflags "-X main.appVersion=$(git describe --tags --always --dirty)"
+var appVersion = "dev"
+
 func main() {
 	port := flag.Int("port", 5700, "HTTP API port")
 	storePath := flag.String("store", "", "data file path")
@@ -30,6 +35,7 @@ func main() {
 	}
 
 	c := counter.New()
+	c.Version = appVersion
 
 	if err := persist.LoadFromFile(*storePath, c); err != nil {
 		log.Printf("warning: failed to load existing stats: %v", err)
